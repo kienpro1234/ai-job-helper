@@ -1,0 +1,69 @@
+"use client";
+
+import { useState } from "react";
+import MDEditor from "@uiw/react-md-editor";
+import { Button } from "@/components/ui/button";
+import { Download, Loader2 } from "lucide-react";
+import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
+import ResumeAnalyzer from "@/app/(main)/resume/_components/resume-analyzer";
+import rehypeRaw from "rehype-raw";
+import "../resume-styles.css";
+// Tái sử dụng component analyzer
+
+export const ResumeViewer = ({ resume }) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generatePDF = async () => {
+    setIsGenerating(true);
+    const element = document.getElementById(`resume-pdf-${resume.id}`);
+    const opt = {
+      margin: [10, 5],
+      filename: `${resume.title.replace(/ /g, "_")}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 4, useCORS: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+    await html2pdf().set(opt).from(element).save();
+    setIsGenerating(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <h1 className="font-bold gradient-title text-4xl md:text-5xl">
+          {resume.title}
+        </h1>
+        <Button onClick={generatePDF} disabled={isGenerating}>
+          {isGenerating ? <Loader2 className="animate-spin" /> : <Download />}
+          Download PDF
+        </Button>
+      </div>
+
+      {/* Phần hiển thị nội dung CV */}
+      {/* <div data-color-mode="light" className="border rounded-lg p-4"> */}
+      <div data-color-mode="light" id={`resume-pdf`}>
+        <div className="resume-container">
+          <MDEditor.Markdown
+            source={resume.content}
+            style={{ padding: "10px", background: "white", color: "black" }}
+            rehypePlugins={[rehypeRaw]}
+          />
+        </div>
+      </div>
+      {/* Phần ẩn để tạo PDF */}
+      <div className="pdf-render-offscreen">
+        {/* Muốn xem pdf có css nữa thì phải css ở đây nữa  */}
+        <div id={`resume-pdf-${resume.id}`} className="resume-container">
+          <MDEditor.Markdown
+            source={resume.content}
+            style={{ background: "white", color: "black" }}
+            rehypePlugins={[rehypeRaw]}
+          />
+        </div>
+      </div>
+
+      {/* Component phân tích CV */}
+      <ResumeAnalyzer resumeId={resume.id} />
+    </div>
+  );
+};

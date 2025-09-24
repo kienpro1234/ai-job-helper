@@ -63,6 +63,7 @@ export const resumeSchema = z.object({
   experience: z.array(entrySchema),
   education: z.array(entrySchema),
   projects: z.array(entrySchema),
+  title: z.string().min(1, "Resume title is required"),
 });
 
 export const coverLetterSchema = z.object({

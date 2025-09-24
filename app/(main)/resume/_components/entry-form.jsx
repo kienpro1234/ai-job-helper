@@ -78,10 +78,25 @@ export function EntryForm({ type, entries, onChange }) {
 
   // Add this effect to handle the improvement result
   useEffect(() => {
-    if (improvedContent && !isImproving) {
-      setValue("description", improvedContent);
+    // Sửa ở đây:
+    // Vì action `improveWithAI` trả về một chuỗi, nên `improvedContent` chính là chuỗi đó.
+    // Chúng ta chỉ cần kiểm tra xem chuỗi này có tồn tại và có nội dung hay không.
+    if (
+      improvedContent &&
+      typeof improvedContent === "string" &&
+      improvedContent.trim() !== "" &&
+      !isImproving
+    ) {
+      setValue("description", improvedContent); // Gán trực tiếp chuỗi này vào
       toast.success("Description improved successfully!");
     }
+    // Nếu AI trả về một chuỗi rỗng
+    else if (improvedContent !== undefined && !isImproving) {
+      toast.error(
+        "AI could not improve the text. Please try rephrasing or adding more details."
+      );
+    }
+
     if (improveError) {
       toast.error(improveError.message || "Failed to improve description");
     }
