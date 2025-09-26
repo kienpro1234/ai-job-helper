@@ -138,6 +138,7 @@ model SavedJob {
   description     String    @db.Text
   url             String    @unique
   source          String?   // Nguồn gốc công việc (VD: "LinkedIn", "TopCV")
+  sourceType      String? 
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

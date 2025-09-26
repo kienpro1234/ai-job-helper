@@ -14,6 +14,8 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+
+import { Badge } from "@/components/ui/badge";
 import {
   Loader2,
   Search,
@@ -23,9 +25,6 @@ import {
   MapPin,
   Globe,
 } from "lucide-react";
-
-// Hàm tiện ích để tạo độ trễ
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function JobSearchTab() {
   const [jobs, setJobs] = useState([]);
@@ -119,17 +118,29 @@ export default function JobSearchTab() {
                 {job.description}
               </p>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="ghost" size="sm" asChild>
-                <a href={job.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View Job
-                </a>
-              </Button>
-              <Button size="sm" onClick={() => handleSaveJob(job)}>
-                <Save className="h-4 w-4 mr-2" />
-                Save
-              </Button>
+            <CardFooter className="flex justify-between items-center">
+              {job.sourceType === "JSearch" ? (
+                <Badge
+                  variant="secondary"
+                  className="border-green-500 text-green-500"
+                >
+                  Jsearch
+                </Badge>
+              ) : (
+                <Badge variant="outline">Google Search</Badge>
+              )}
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <a href={job.url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View Job
+                  </a>
+                </Button>
+                <Button size="sm" onClick={() => handleSaveJob(job)}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         ))}

@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 export default function SavedJobsTab({ initialSavedJobs }) {
   const [savedJobs, setSavedJobs] = useState(initialSavedJobs);
@@ -67,36 +68,54 @@ export default function SavedJobsTab({ initialSavedJobs }) {
               {job.description}
             </p>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" size="sm" asChild>
-              <a href={job.url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View Original
-              </a>
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Remove
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently remove the saved job. This action
-                    cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleDelete(job.id)}>
+          <CardFooter className="flex justify-between items-center">
+            {
+              job.sourceType ? (
+                job.sourceType === "JSearch" ? (
+                  <Badge
+                    variant="secondary"
+                    className="border-green-500 text-green-500"
+                  >
+                    Jsearch
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">Google Search</Badge>
+                )
+              ) : (
+                <div />
+              ) /* Để trống nếu job cũ chưa có sourceType */
+            }
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" asChild>
+                <a href={job.url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View Original
+                </a>
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
                     Remove
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently remove the saved job. This action
+                      cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDelete(job.id)}>
+                      Remove
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </CardFooter>
         </Card>
       ))}
