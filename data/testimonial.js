@@ -1,26 +1,26 @@
 export const testimonial = [
   {
     quote:
-      "The AI-powered interview prep was a game-changer. Landed my dream job at a top tech company!",
-    author: "Sarah Chen",
-    image: "https://randomuser.me/api/portraits/women/75.jpg",
-    role: "Software Engineer",
-    company: "Tech Giant Co.",
+      "The AI-driven resume analysis is incredibly detailed. It helped me identify key areas for improvement, and I started getting more callbacks almost immediately. A must-have tool for any serious job seeker.",
+    author: "Alex Johnson",
+    image: "/new-banner1.png",
+    role: "Data Analyst",
+    company: "Innovate Inc.",
   },
   {
     quote:
-      "The industry insights helped me pivot my career successfully. The salary data was spot-on!",
-    author: "Michael Rodriguez",
-    image: "https://randomuser.me/api/portraits/men/75.jpg",
-    role: "Product Manager",
-    company: "StartUp Inc.",
+      "I used to dread writing cover letters, but the AI generator is a lifesaver. It creates tailored, professional letters in seconds, allowing me to apply for more jobs with confidence.",
+    author: "Maria Garcia",
+    image: "/new-banner3.png",
+    role: "UX/UI Designer",
+    company: "Creative Solutions",
   },
   {
     quote:
-      "My resume's ATS score improved significantly. Got more interviews in two weeks than in six months!",
-    author: "Priya Patel",
-    image: "https://randomuser.me/api/portraits/women/74.jpg",
-    role: "Marketing Director",
-    company: "Global Corp",
+      "The interview preparation feature is fantastic. The questions were relevant to my field, and the performance tracking helped me pinpoint my weaknesses. I felt fully prepared for my interviews.",
+    author: "David Lee",
+    image: "/new-banner2.png",
+    role: "Marketing Specialist",
+    company: "Growth Co.",
   },
 ];

@@ -1,68 +1,119 @@
+// "use client";
+
+// import React, { useEffect, useRef } from "react";
+// import Image from "next/image";
+// import { Button } from "@/components/ui/button";
+// import Link from "next/link";
+
+// const HeroSection = () => {
+//   const imageRef = useRef(null);
+
+//   useEffect(() => {
+//     const imageElement = imageRef.current;
+
+//     const handleScroll = () => {
+//       const scrollPosition = window.scrollY;
+//       const scrollThreshold = 100;
+
+//       if (scrollPosition > scrollThreshold) {
+//         imageElement.classList.add("scrolled");
+//       } else {
+//         imageElement.classList.remove("scrolled");
+//       }
+//     };
+
+//     window.addEventListener("scroll", handleScroll);
+//     return () => window.removeEventListener("scroll", handleScroll);
+//   }, []);
+
+//   return (
+//     <section className="w-full pt-36 md:pt-48 pb-10">
+//       <div className="space-y-6 text-center">
+//         <div className="space-y-6 mx-auto">
+//           <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl xl:text-8xl gradient-title animate-gradient">
+//             Your AI Career Coach for
+//             <br />
+//             Professional Success
+//           </h1>
+//           <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl">
+//             Advance your career with personalized guidance, interview prep, and
+//             AI-powered tools for job success.
+//           </p>
+//         </div>
+//         <div className="flex justify-center space-x-4">
+//           <Link href="/dashboard">
+//             <Button size="lg" className="px-8">
+//               Get Started
+//             </Button>
+//           </Link>
+//           <Link href="https://www.youtube.com/roadsidecoder">
+//             <Button size="lg" variant="outline" className="px-8">
+//               Watch Demo
+//             </Button>
+//           </Link>
+//         </div>
+//         <div className="hero-image-wrapper mt-5 md:mt-0">
+//           <div ref={imageRef} className="hero-image">
+//             <Image
+//               src="/banner.jpeg"
+//               width={1280}
+//               height={720}
+//               alt="Dashboard Preview"
+//               className="rounded-lg shadow-2xl border mx-auto"
+//               priority
+//             />
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default HeroSection;
+
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const HeroSection = () => {
-  const imageRef = useRef(null);
-
-  useEffect(() => {
-    const imageElement = imageRef.current;
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      const scrollThreshold = 100;
-
-      if (scrollPosition > scrollThreshold) {
-        imageElement.classList.add("scrolled");
-      } else {
-        imageElement.classList.remove("scrolled");
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <section className="w-full pt-36 md:pt-48 pb-10">
-      <div className="space-y-6 text-center">
-        <div className="space-y-6 mx-auto">
-          <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl xl:text-8xl gradient-title animate-gradient">
-            Your AI Career Coach for
+    <section className="w-full pt-28 pb-16 md:pt-36 md:pb-24">
+      <div className="container mx-auto px-4 md:px-6 grid md:grid-cols-2 gap-12 items-center">
+        <div className="space-y-6 text-center md:text-left">
+          <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl gradient-title animate-gradient">
+            A personal AI career assistant
             <br />
-            Professional Success
+            Just for you
           </h1>
-          <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl">
-            Advance your career with personalized guidance, interview prep, and
-            AI-powered tools for job success.
+          <p className="mx-auto max-w-xl text-muted-foreground md:text-xl md:mx-0">
+            Take your career to the next level with AI: Design your CV, generate
+            cover letters, and sharpen interview skills.
           </p>
-        </div>
-        <div className="flex justify-center space-x-4">
-          <Link href="/dashboard">
-            <Button size="lg" className="px-8">
-              Get Started
-            </Button>
-          </Link>
-          <Link href="https://www.youtube.com/roadsidecoder">
-            <Button size="lg" variant="outline" className="px-8">
-              Watch Demo
-            </Button>
-          </Link>
-        </div>
-        <div className="hero-image-wrapper mt-5 md:mt-0">
-          <div ref={imageRef} className="hero-image">
-            <Image
-              src="/banner.jpeg"
-              width={1280}
-              height={720}
-              alt="Dashboard Preview"
-              className="rounded-lg shadow-2xl border mx-auto"
-              priority
-            />
+          <div className="flex justify-center md:justify-start space-x-4">
+            <Link href="/dashboard">
+              <Button size="lg" className="px-8 py-6 text-lg">
+                Start now
+              </Button>
+            </Link>
+            <Link href="#how-it-works">
+              <Button size="lg" variant="outline" className="px-8 py-6 text-lg">
+                How it works
+              </Button>
+            </Link>
           </div>
+        </div>
+        <div className="hero-image-container">
+          <Image
+            src="/new-banner1.png" // Sử dụng ảnh mới
+            width={1280}
+            height={720}
+            alt="AI Career Coach"
+            className="rounded-lg shadow-2xl border mx-auto"
+            priority
+          />
         </div>
       </div>
     </section>

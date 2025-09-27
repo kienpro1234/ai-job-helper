@@ -1,27 +1,28 @@
-import { BrainCircuit, Briefcase, LineChart, ScrollText } from "lucide-react";
+import { Compass, Mic, DatabaseZap, FilePlus2 } from "lucide-react";
 
 export const features = [
   {
-    icon: <BrainCircuit className="w-10 h-10 mb-4 text-primary" />,
-    title: "AI-Powered Career Guidance",
+    icon: <Compass className="w-12 h-12 text-primary" />,
+    title: "Strategic Career Blueprint",
     description:
-      "Get personalized career advice and insights powered by advanced AI technology.",
+      "Leverage AI to map your career path. Receive personalized recommendations and strategic advice based on your profile and industry data to navigate your professional journey with clarity.",
   },
   {
-    icon: <Briefcase className="w-10 h-10 mb-4 text-primary" />,
-    title: "Interview Preparation",
+    icon: <Mic className="w-12 h-12 text-primary" />,
+    title: "Elite Interview Simulation",
     description:
-      "Practice with role-specific questions and get instant feedback to improve your performance.",
+      "Step into realistic, AI-driven mock interviews tailored to your target roles. Gain a competitive edge with instant, actionable feedback to refine your answers and boost your confidence.",
   },
   {
-    icon: <LineChart className="w-10 h-10 mb-4 text-primary" />,
-    title: "Industry Insights",
+    icon: <DatabaseZap className="w-12 h-12 text-primary" />,
+    title: "Real-Time Market Intelligence",
     description:
-      "Stay ahead with real-time industry trends, salary data, and market analysis.",
+      "Access a dynamic dashboard of crucial market data. Stay informed on salary benchmarks, emerging skill demands, and key industry trends to position yourself as a top candidate.",
   },
   {
-    icon: <ScrollText className="w-10 h-10 mb-4 text-primary" />,
-    title: "Smart Resume Creation",
-    description: "Generate ATS-optimized resumes with AI assistance.",
+    icon: <FilePlus2 className="w-12 h-12 text-primary" />,
+    title: "Dynamic Document Crafting",
+    description:
+      "Build powerful, ATS-compliant resumes and cover letters that command attention. Our AI tools help you articulate your value and tailor your application for any opportunity.",
   },
 ];

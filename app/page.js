@@ -1,28 +1,247 @@
-import React from "react";
+// import React from "react";
+// import Link from "next/link";
+// import { Button } from "@/components/ui/button";
+// import { Card, CardContent } from "@/components/ui/card";
+// import {
+//   ArrowRight,
+//   Trophy,
+//   Target,
+//   Sparkles,
+//   CheckCircle2,
+// } from "lucide-react";
+// import HeroSection from "@/components/hero";
+// import {
+//   Accordion,
+//   AccordionContent,
+//   AccordionItem,
+//   AccordionTrigger,
+// } from "@/components/ui/accordion";
+// import Image from "next/image";
+// import { features } from "@/data/features";
+// import { testimonial } from "@/data/testimonial";
+// import { faqs } from "@/data/faqs";
+// import { howItWorks } from "@/data/howItWorks";
+
+// export default function LandingPage() {
+//   return (
+//     <>
+//       <div className="grid-background"></div>
+
+//       {/* Hero Section */}
+//       <HeroSection />
+
+//       {/* Features Section */}
+//       <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
+//         <div className="container mx-auto px-4 md:px-6">
+//           <h2 className="text-3xl font-bold tracking-tighter text-center mb-12">
+//             Powerful Features for Your Career Growth
+//           </h2>
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+//             {features.map((feature, index) => (
+//               <Card
+//                 key={index}
+//                 className="border-2 hover:border-primary transition-colors duration-300"
+//               >
+//                 <CardContent className="pt-6 text-center flex flex-col items-center">
+//                   <div className="flex flex-col items-center justify-center">
+//                     {feature.icon}
+//                     <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+//                     <p className="text-muted-foreground">
+//                       {feature.description}
+//                     </p>
+//                   </div>
+//                 </CardContent>
+//               </Card>
+//             ))}
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Stats Section */}
+//       <section className="w-full py-12 md:py-24 bg-muted/50">
+//         <div className="container mx-auto px-4 md:px-6">
+//           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
+//             <div className="flex flex-col items-center justify-center space-y-2">
+//               <h3 className="text-4xl font-bold">50+</h3>
+//               <p className="text-muted-foreground">Industries Covered</p>
+//             </div>
+//             <div className="flex flex-col items-center justify-center space-y-2">
+//               <h3 className="text-4xl font-bold">1000+</h3>
+//               <p className="text-muted-foreground">Interview Questions</p>
+//             </div>
+//             <div className="flex flex-col items-center justify-center space-y-2">
+//               <h3 className="text-4xl font-bold">95%</h3>
+//               <p className="text-muted-foreground">Success Rate</p>
+//             </div>
+//             <div className="flex flex-col items-center justify-center space-y-2">
+//               <h3 className="text-4xl font-bold">24/7</h3>
+//               <p className="text-muted-foreground">AI Support</p>
+//             </div>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* How It Works Section */}
+//       <section className="w-full py-12 md:py-24 bg-background">
+//         <div className="container mx-auto px-4 md:px-6">
+//           <div className="text-center max-w-3xl mx-auto mb-12">
+//             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
+//             <p className="text-muted-foreground">
+//               Four simple steps to accelerate your career growth
+//             </p>
+//           </div>
+
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+//             {howItWorks.map((item, index) => (
+//               <div
+//                 key={index}
+//                 className="flex flex-col items-center text-center space-y-4"
+//               >
+//                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+//                   {item.icon}
+//                 </div>
+//                 <h3 className="font-semibold text-xl">{item.title}</h3>
+//                 <p className="text-muted-foreground">{item.description}</p>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </section>
+
+//       <section className="w-full py-12 md:py-24 bg-muted/50">
+//         <div className="container mx-auto px-4 md:px-6">
+//           <h2 className="text-3xl font-bold text-center mb-12">
+//             What Our Users Say
+//           </h2>
+//           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+//             {testimonial.map((testimonial, index) => (
+//               <Card key={index} className="bg-background">
+//                 <CardContent className="pt-6">
+//                   <div className="flex flex-col space-y-4">
+//                     <div className="flex items-center space-x-4 mb-4">
+//                       <div className="relative h-12 w-12 flex-shrink-0">
+//                         <Image
+//                           width={40}
+//                           height={40}
+//                           src={testimonial.image}
+//                           alt={testimonial.author}
+//                           className="rounded-full object-cover border-2 border-primary/20"
+//                         />
+//                       </div>
+//                       <div>
+//                         <p className="font-semibold">{testimonial.author}</p>
+//                         <p className="text-sm text-muted-foreground">
+//                           {testimonial.role}
+//                         </p>
+//                         <p className="text-sm text-primary">
+//                           {testimonial.company}
+//                         </p>
+//                       </div>
+//                     </div>
+//                     <blockquote>
+//                       <p className="text-muted-foreground italic relative">
+//                         <span className="text-3xl text-primary absolute -top-4 -left-2">
+//                           &quot;
+//                         </span>
+//                         {testimonial.quote}
+//                         <span className="text-3xl text-primary absolute -bottom-4">
+//                           &quot;
+//                         </span>
+//                       </p>
+//                     </blockquote>
+//                   </div>
+//                 </CardContent>
+//               </Card>
+//             ))}
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* FAQ Section */}
+//       <section className="w-full py-12 md:py-24">
+//         <div className="container mx-auto px-4 md:px-6">
+//           <div className="text-center max-w-3xl mx-auto mb-12">
+//             <h2 className="text-3xl font-bold mb-4">
+//               Frequently Asked Questions
+//             </h2>
+//             <p className="text-muted-foreground">
+//               Find answers to common questions about our platform
+//             </p>
+//           </div>
+
+//           <div className="max-w-3xl mx-auto">
+//             <Accordion type="single" collapsible className="w-full">
+//               {faqs.map((faq, index) => (
+//                 <AccordionItem key={index} value={`item-${index}`}>
+//                   <AccordionTrigger className="text-left">
+//                     {faq.question}
+//                   </AccordionTrigger>
+//                   <AccordionContent>{faq.answer}</AccordionContent>
+//                 </AccordionItem>
+//               ))}
+//             </Accordion>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* CTA Section */}
+//       <section className="w-full">
+//         <div className="mx-auto py-24 gradient rounded-lg">
+//           <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-3xl mx-auto">
+//             <h2 className="text-3xl font-bold tracking-tighter text-primary-foreground sm:text-4xl md:text-5xl">
+//               Ready to Accelerate Your Career?
+//             </h2>
+//             <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-xl">
+//               Join thousands of professionals who are advancing their careers
+//               with AI-powered guidance.
+//             </p>
+//             <Link href="/dashboard" passHref>
+//               <Button
+//                 size="lg"
+//                 variant="secondary"
+//                 className="h-11 mt-5 animate-bounce"
+//               >
+//                 Start Your Journey Today <ArrowRight className="ml-2 h-4 w-4" />
+//               </Button>
+//             </Link>
+//           </div>
+//         </div>
+//       </section>
+//     </>
+//   );
+// }
+
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  ArrowRight,
-  Trophy,
-  Target,
-  Sparkles,
-  CheckCircle2,
-} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, CheckCircle, Quote } from "lucide-react";
 import HeroSection from "@/components/hero";
+import Image from "next/image";
+import { features } from "@/data/features";
+import { testimonial } from "@/data/testimonial";
+import { faqs } from "@/data/faqs";
+import { howItWorks } from "@/data/howItWorks";
+import { userGuide } from "@/data/userGuide";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import Image from "next/image";
-import { features } from "@/data/features";
-import { testimonial } from "@/data/testimonial";
-import { faqs } from "@/data/faqs";
-import { howItWorks } from "@/data/howItWorks";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function LandingPage() {
+  const [activeGuide, setActiveGuide] = useState(userGuide[0]);
   return (
     <>
       <div className="grid-background"></div>
@@ -30,26 +249,38 @@ export default function LandingPage() {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Features Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
+      {/* How It Works Section */}
+      <section
+        id="how-it-works"
+        className="w-full py-20 md:py-32 bg-background"
+      >
         <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter text-center mb-12">
-            Powerful Features for Your Career Growth
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {features.map((feature, index) => (
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl font-bold mb-4 gradient-title">
+              Efficient Workflow
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Discover 4 core features that help you gain more confidence on
+              your career path.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {howItWorks.map((item, index) => (
               <Card
                 key={index}
-                className="border-2 hover:border-primary transition-colors duration-300"
+                className="how-it-works-card border-2 border-transparent hover:border-primary/50 hover:-translate-y-2 transition-all duration-300"
               >
-                <CardContent className="pt-6 text-center flex flex-col items-center">
-                  <div className="flex flex-col items-center justify-center">
-                    {feature.icon}
-                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground">
-                      {feature.description}
-                    </p>
+                <CardHeader className="flex flex-col items-center text-center">
+                  <div className="mb-4 p-4 bg-primary/10 rounded-full">
+                    {item.icon}
                   </div>
+                  <CardTitle className="text-xl">{item.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-muted-foreground h-20">
+                    {item.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -57,154 +288,225 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="w-full py-12 md:py-24 bg-muted/50">
+      {/* Features Section */}
+      <section id="features" className="w-full py-20 md:py-32 bg-muted/50">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <h3 className="text-4xl font-bold">50+</h3>
-              <p className="text-muted-foreground">Industries Covered</p>
-            </div>
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <h3 className="text-4xl font-bold">1000+</h3>
-              <p className="text-muted-foreground">Interview Questions</p>
-            </div>
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <h3 className="text-4xl font-bold">95%</h3>
-              <p className="text-muted-foreground">Success Rate</p>
-            </div>
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <h3 className="text-4xl font-bold">24/7</h3>
-              <p className="text-muted-foreground">AI Support</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="w-full py-12 md:py-24 bg-background">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-            <p className="text-muted-foreground">
-              Four simple steps to accelerate your career growth
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-4xl font-bold mb-4 gradient-title">
+              Optimize Your Career Journey
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              All the tools you need to build a solid career are right here,
+              powered by AI.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            {howItWorks.map((item, index) => (
+          <div className="space-y-24">
+            {features.map((feature, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center text-center space-y-4"
+                className="grid md:grid-cols-2 gap-12 items-center"
               >
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  {item.icon}
+                {/* Icon Section */}
+                <div
+                  className={`flex justify-center ${
+                    index % 2 === 1 ? "md:order-last" : ""
+                  }`}
+                >
+                  {/* ADDED a new class here for styling */}
+                  <div className="feature-icon-container">{feature.icon}</div>
                 </div>
-                <h3 className="font-semibold text-xl">{item.title}</h3>
-                <p className="text-muted-foreground">{item.description}</p>
+                {/* Content Section */}
+                <div
+                  className={`space-y-4 text-center md:text-left ${
+                    index % 2 === 1 ? "md:order-first" : ""
+                  }`}
+                >
+                  <h3 className="text-3xl font-bold text-primary">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground text-lg leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="w-full py-12 md:py-24 bg-muted/50">
+      {/* Testimonials Section */}
+      <section
+        id="testimonials"
+        className="w-full py-20 md:py-32 bg-background"
+      >
         <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            What Our Users Say
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {testimonial.map((testimonial, index) => (
-              <Card key={index} className="bg-background">
-                <CardContent className="pt-6">
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="relative h-12 w-12 flex-shrink-0">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl font-bold mb-4 gradient-title">
+              Success Stories from Our Users
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              See how professionals are leveraging our AI to land their dream
+              jobs.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-5 gap-8 max-w-7xl mx-auto items-center">
+            {/* Featured Testimonial */}
+            <Card className="lg:col-span-3 bg-card/50 backdrop-blur-sm border flex flex-col p-8 rounded-xl shadow-lg">
+              <CardContent className="flex-grow flex flex-col justify-center p-0">
+                <Quote className="w-12 h-12 text-primary/20 mb-4" />
+                <blockquote className="flex-grow">
+                  <p className="text-2xl font-medium text-foreground">
+                    {testimonial[0].quote}
+                  </p>
+                </blockquote>
+                <footer className="mt-6">
+                  <div className="flex items-center space-x-4">
+                    <Image
+                      width={64}
+                      height={64}
+                      src={testimonial[0].image}
+                      alt={testimonial[0].author}
+                      className="rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-semibold text-lg text-primary">
+                        {testimonial[0].author}
+                      </p>
+                      <p className="text-muted-foreground">
+                        {testimonial[0].role} at {testimonial[0].company}
+                      </p>
+                    </div>
+                  </div>
+                </footer>
+              </CardContent>
+            </Card>
+
+            {/* Other Testimonials */}
+            <div className="lg:col-span-2 space-y-8">
+              {testimonial.slice(1).map((item, index) => (
+                <Card
+                  key={index}
+                  className="bg-card border p-6 rounded-xl shadow-md hover-lift"
+                >
+                  <CardContent className="p-0">
+                    <blockquote className="space-y-4">
+                      <p className="text-muted-foreground">
+                        &quot;{item.quote}&quot;
+                      </p>
+                      <footer className="flex items-center space-x-3">
                         <Image
                           width={40}
                           height={40}
-                          src={testimonial.image}
-                          alt={testimonial.author}
-                          className="rounded-full object-cover border-2 border-primary/20"
+                          src={item.image}
+                          alt={item.author}
+                          className="rounded-full object-cover"
                         />
-                      </div>
-                      <div>
-                        <p className="font-semibold">{testimonial.author}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {testimonial.role}
-                        </p>
-                        <p className="text-sm text-primary">
-                          {testimonial.company}
-                        </p>
-                      </div>
-                    </div>
-                    <blockquote>
-                      <p className="text-muted-foreground italic relative">
-                        <span className="text-3xl text-primary absolute -top-4 -left-2">
-                          &quot;
-                        </span>
-                        {testimonial.quote}
-                        <span className="text-3xl text-primary absolute -bottom-4">
-                          &quot;
-                        </span>
-                      </p>
+                        <div>
+                          <p className="font-semibold text-primary">
+                            {item.author}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {item.role}
+                          </p>
+                        </div>
+                      </footer>
                     </blockquote>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="w-full py-12 md:py-24">
+      {/* User Guide Section */}
+      <section id="guide" className="w-full py-20 md:py-32 bg-muted/50">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              Frequently Asked Questions
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl font-bold mb-4 gradient-title">
+              Your Roadmap to Success
             </h2>
-            <p className="text-muted-foreground">
-              Find answers to common questions about our platform
+            <p className="text-muted-foreground text-lg">
+              Follow these steps to make the most of our AI-powered tools and
+              accelerate your career.
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto">
-            <Accordion type="single" collapsible className="w-full">
-              {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent>{faq.answer}</AccordionContent>
-                </AccordionItem>
+          <div className="grid md:grid-cols-3 gap-8 lg:gap-12 max-w-7xl mx-auto">
+            {/* Step Selector (Không thay đổi) */}
+            <div className="md:col-span-1 flex flex-col space-y-4">
+              {userGuide.map((guide) => (
+                <Button
+                  key={guide.id}
+                  variant={activeGuide.id === guide.id ? "default" : "outline"}
+                  size="lg"
+                  className="justify-start p-6 text-left h-auto text-base"
+                  onClick={() => setActiveGuide(guide)}
+                >
+                  <span className="text-wrap">{guide.title}</span>
+                </Button>
               ))}
-            </Accordion>
+            </div>
+
+            {/* Step Content - Đã cập nhật */}
+            <div className="md:col-span-2">
+              <Card className="p-6 h-full shadow-lg">
+                <CardContent className="p-0 flex flex-col h-full">
+                  {/* Bọc hình ảnh bằng Dialog để có thể click */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      {/* SỬA Ở ĐÂY: Thêm cursor-pointer và thay đổi object-cover thành object-contain */}
+                      <div className="aspect-video w-full overflow-hidden rounded-lg mb-6 border bg-black/20 cursor-pointer">
+                        <Image
+                          src={activeGuide.image}
+                          alt={activeGuide.title}
+                          width={1280}
+                          height={720}
+                          className="w-full h-full object-contain transition-transform duration-300 hover:scale-105" // Thay đổi ở đây
+                        />
+                      </div>
+                    </DialogTrigger>
+                    {/* THÊM VÀO: Nội dung của Dialog khi click vào ảnh */}
+                    <DialogContent className="max-w-6xl p-4">
+                      {/* Thêm DialogHeader và DialogTitle với class sr-only để ẩn đi tránh gây lỗi accessibility */}
+                      <DialogHeader>
+                        <DialogTitle className="sr-only">
+                          {activeGuide.title}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <Image
+                        src={activeGuide.image}
+                        alt={activeGuide.title}
+                        width={1920}
+                        height={1080}
+                        className="w-full h-auto rounded-lg"
+                      />
+                    </DialogContent>
+                  </Dialog>
+
+                  <h3 className="text-2xl font-bold text-primary mb-3">
+                    {activeGuide.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {activeGuide.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="w-full">
-        <div className="mx-auto py-24 gradient rounded-lg">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold tracking-tighter text-primary-foreground sm:text-4xl md:text-5xl">
-              Ready to Accelerate Your Career?
-            </h2>
-            <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-xl">
-              Join thousands of professionals who are advancing their careers
-              with AI-powered guidance.
-            </p>
-            <Link href="/dashboard" passHref>
-              <Button
-                size="lg"
-                variant="secondary"
-                className="h-11 mt-5 animate-bounce"
-              >
-                Start Your Journey Today <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
+      <section className="w-full py-24 md:py-32">
+        <div className="container mx-auto px-4 md:px-6 flex justify-center">
+          <Link href="/dashboard" passHref>
+            <Button size="lg" className="cta-launch-button group">
+              Launch Your Career{" "}
+              <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+            </Button>
+          </Link>
         </div>
       </section>
     </>

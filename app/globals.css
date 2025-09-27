@@ -121,3 +121,170 @@ body {
   height: 100%;
   background: radial-gradient(circle, transparent, rgba(0, 0, 0, 0.9));
 }
+
+@layer utilities {
+  .hover-lift {
+    @apply transition-transform duration-300 ease-in-out;
+  }
+  .hover-lift:hover {
+    @apply -translate-y-2;
+  }
+
+  .hero-image-container {
+    transform: perspective(1000px) rotateY(-10deg) rotateX(2deg) scale(0.95);
+    transition: transform 0.5s ease-out;
+    box-shadow: -20px 20px 40px rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+  }
+
+  .hero-image-container:hover {
+    transform: perspective(1000px) rotateY(0) rotateX(0) scale(1);
+  }
+
+  .how-it-works-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .how-it-works-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at center,
+      hsla(var(--primary-foreground), 0.1),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 0;
+  }
+
+  .how-it-works-card:hover::before {
+    opacity: 1;
+  }
+
+  .how-it-works-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 20px 5px hsla(var(--primary), 0),
+        0 0 0 0 hsla(var(--primary), 0.2);
+    }
+    50% {
+      box-shadow: 0 0 35px 10px hsla(var(--primary), 0.3),
+        0 0 0 10px hsla(var(--primary), 0);
+    }
+  }
+
+  .feature-icon-container {
+    @apply w-48 h-48 bg-card rounded-full flex items-center justify-center border shadow-xl relative;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .feature-icon-container svg {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .feature-icon-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px hsla(var(--primary), 0.1);
+    animation: pulse-glow 2.5s infinite;
+  }
+
+  .feature-icon-container:hover svg {
+    transform: scale(1.1);
+  }
+
+  @keyframes scan {
+    0% {
+      background-position: -150% 0;
+    }
+    100% {
+      background-position: 250% 0;
+    }
+  }
+
+  .cta-launch-button {
+    /* Base styles: size, shape, font */
+    @apply relative inline-flex items-center justify-center rounded-full px-12 py-8 text-xl font-bold transition-transform duration-300 overflow-hidden;
+
+    /* --- PHẦN SỬA LỖI QUAN TRỌNG --- */
+    /* Ghi đè màu nền và màu chữ một cách tường minh */
+    background-color: hsl(var(--secondary)); /* Nền màu xám tối để nổi bật */
+    color: hsl(var(--foreground)); /* Chữ màu sáng */
+    border: 1px solid hsl(var(--border));
+    min-width: 300px;
+  }
+
+  /* Hiệu ứng quét sáng */
+  .cta-launch-button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      hsla(var(--primary), 0.4),
+      transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: scan 3s linear infinite;
+  }
+
+  /* Đảm bảo text và icon luôn nằm trên cùng */
+  .cta-launch-button > * {
+    @apply relative z-10;
+  }
+
+  .cta-launch-button:hover {
+    transform: scale(1.05);
+    /* Làm cho viền và hiệu ứng sáng hơn khi hover */
+    border-color: hsl(var(--primary));
+    @apply text-black;
+  }
+
+  .nav-link {
+    @apply relative flex items-center;
+  }
+  .nav-link:hover,
+  .nav-link.active {
+    @apply text-foreground;
+  }
+  .nav-link::after {
+    content: "";
+    @apply absolute bottom-[-4px] left-0 w-full h-[2px] bg-primary scale-x-0 origin-bottom-left transition-transform duration-300 ease-out;
+  }
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    @apply scale-x-100;
+  }
+}
+
+/* Thêm hiệu ứng cho gradient text */
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-animation 5s ease infinite;
+}

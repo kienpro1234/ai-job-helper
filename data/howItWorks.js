@@ -1,25 +1,28 @@
-import { UserPlus, FileEdit, Users, LineChart } from "lucide-react";
+import { Search, FileText, PenBox, GraduationCap } from "lucide-react";
 
 export const howItWorks = [
   {
-    title: "Professional Onboarding",
-    description: "Share your industry and expertise for personalized guidance",
-    icon: <UserPlus className="w-8 h-8 text-primary" />,
-  },
-  {
-    title: "Craft Your Documents",
-    description: "Create ATS-optimized resumes and compelling cover letters",
-    icon: <FileEdit className="w-8 h-8 text-primary" />,
-  },
-  {
-    title: "Prepare for Interviews",
+    title: "AI Job Assistant",
     description:
-      "Practice with AI-powered mock interviews tailored to your role",
-    icon: <Users className="w-8 h-8 text-primary" />,
+      "Search, save, and manage suitable jobs from various sources with the help of AI.",
+    icon: <Search className="w-10 h-10 text-primary" />,
   },
   {
-    title: "Track Your Progress",
-    description: "Monitor improvements with detailed performance analytics",
-    icon: <LineChart className="w-8 h-8 text-primary" />,
+    title: "Build Resume",
+    description:
+      "Build a professional, ATS-optimized resume and receive detailed feedback from AI.",
+    icon: <FileText className="w-10 h-10 text-primary" />,
+  },
+  {
+    title: "AI Cover Letter",
+    description:
+      "Create impressive cover letters tailored to each job application in just a few seconds.",
+    icon: <PenBox className="w-10 h-10 text-primary" />,
+  },
+  {
+    title: "Interview Prep",
+    description:
+      "Practice for interviews with AI-generated questions based on your skills and track your progress.",
+    icon: <GraduationCap className="w-10 h-10 text-primary" />,
   },
 ];
