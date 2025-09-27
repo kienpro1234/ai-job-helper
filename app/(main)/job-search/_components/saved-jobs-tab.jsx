@@ -12,7 +12,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, ExternalLink, Briefcase, MapPin, Globe } from "lucide-react";
+import {
+  Trash2,
+  ExternalLink,
+  Briefcase,
+  MapPin,
+  Globe,
+  FileScan,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,9 +32,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { ResumeSelectionModal } from "./ResumeSelectionModal";
 
 export default function SavedJobsTab({ initialSavedJobs }) {
   const [savedJobs, setSavedJobs] = useState(initialSavedJobs);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const handleDelete = async (id) => {
     const result = await deleteSavedJob(id);
@@ -92,6 +101,16 @@ export default function SavedJobsTab({ initialSavedJobs }) {
                   View Original
                 </a>
               </Button>
+              {job.sourceType === "JSearch" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSelectedJob(job)}
+                >
+                  <FileScan className="h-4 w-4 mr-2" />
+                  Đánh giá CV
+                </Button>
+              )}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm">
@@ -119,6 +138,14 @@ export default function SavedJobsTab({ initialSavedJobs }) {
           </CardFooter>
         </Card>
       ))}
+
+      {selectedJob && (
+        <ResumeSelectionModal
+          job={selectedJob}
+          open={!!selectedJob}
+          onOpenChange={() => setSelectedJob(null)}
+        />
+      )}
     </div>
   );
 }

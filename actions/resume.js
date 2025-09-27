@@ -8,6 +8,24 @@ import { checkUser } from "@/lib/checkUser";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+export async function getResumesWithPagination({ page = 1, limit = 10 }) {
+  const user = await checkUser();
+  if (!user) {
+    return { resumes: [], total: 0 };
+  }
+
+  const where = { userId: user.id };
+  const total = await db.resume.count({ where });
+  const resumes = await db.resume.findMany({
+    where,
+    orderBy: { updatedAt: "desc" },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+
+  return { resumes, total };
+}
+
 // =================================================================
 // CÁC ACTION ĐÃ ĐƯỢC SỬA LỖI VÀ ĐỒNG BỘ
 // =================================================================

@@ -24,7 +24,9 @@ import {
   Briefcase,
   MapPin,
   Globe,
+  FileScan,
 } from "lucide-react";
+import { ResumeSelectionModal } from "./ResumeSelectionModal";
 
 export default function JobSearchTab() {
   const [jobs, setJobs] = useState([]);
@@ -33,6 +35,7 @@ export default function JobSearchTab() {
   const [page, setPage] = useState(1);
   const [currentQuery, setCurrentQuery] = useState("");
   const { register, handleSubmit, getValues } = useForm();
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const handleNewSearch = async (data) => {
     setIsLoading(true);
@@ -140,6 +143,16 @@ export default function JobSearchTab() {
                   <Save className="h-4 w-4 mr-2" />
                   Save
                 </Button>
+                {job.sourceType === "JSearch" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedJob(job)}
+                  >
+                    <FileScan className="h-4 w-4 mr-2" />
+                    Đánh giá CV
+                  </Button>
+                )}
               </div>
             </CardFooter>
           </Card>
@@ -160,6 +173,13 @@ export default function JobSearchTab() {
             )}
           </Button>
         </div>
+      )}
+      {selectedJob && (
+        <ResumeSelectionModal
+          job={selectedJob}
+          open={!!selectedJob}
+          onOpenChange={() => setSelectedJob(null)}
+        />
       )}
     </div>
   );

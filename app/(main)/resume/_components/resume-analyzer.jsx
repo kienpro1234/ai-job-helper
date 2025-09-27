@@ -23,8 +23,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 // Đặt component này ở đâu đó bên trong component ResumePage
-const ResumeAnalyzer = ({ resumeId }) => {
-  const [jobDescription, setJobDescription] = useState("");
+const ResumeAnalyzer = ({ resumeId, initialJd = "" }) => {
+  const [jobDescription, setJobDescription] = useState(initialJd || "");
   const [analysisResult, setAnalysisResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
