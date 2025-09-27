@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAnalysisHistory } from "@/actions/analysis";
+import { getAnalysisHistory, deleteResumeAnalysis } from "@/actions/analysis";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Accordion,
@@ -15,8 +16,23 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { ExternalLink, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const AnalysisHistory = ({ resumeId }) => {
   const [history, setHistory] = useState([]);
@@ -37,6 +53,19 @@ export const AnalysisHistory = ({ resumeId }) => {
       setIsLoading(false);
     }
   }, [resumeId]);
+
+  const handleDelete = async (analysisId) => {
+    const result = await deleteResumeAnalysis(analysisId);
+    if (result.success) {
+      // Cập nhật lại state để UI thay đổi ngay lập tức
+      setHistory((currentHistory) =>
+        currentHistory.filter((item) => item.id !== analysisId)
+      );
+      toast.success("Đã xóa kết quả phân tích.");
+    } else {
+      toast.error(result.error || "Không thể xóa kết quả phân tích.");
+    }
+  };
 
   if (isLoading) {
     return <div>Đang tải lịch sử phân tích...</div>;
@@ -59,7 +88,7 @@ export const AnalysisHistory = ({ resumeId }) => {
           {history.map((item) => (
             <AccordionItem value={item.id} key={item.id}>
               <AccordionTrigger>
-                <div className="flex justify-between w-full pr-4">
+                {/* <div className="flex justify-between w-full pr-4">
                   <span
                     className="truncate max-w-xs md:max-w-md"
                     title={item.jobDescription}
@@ -67,6 +96,24 @@ export const AnalysisHistory = ({ resumeId }) => {
                     {item.jobDescription}
                   </span>
                   <span className="text-sm text-muted-foreground">
+                    {format(new Date(item.createdAt), "dd/MM/yyyy")}
+                  </span>
+                </div> */}
+                <div className="flex flex-col md:flex-row justify-between w-full pr-4 text-left">
+                  {/* === HIỂN THỊ TIÊU ĐỀ JOB VÀ CÔNG TY === */}
+                  <div className="flex-1 truncate">
+                    <p
+                      className="font-semibold truncate"
+                      title={item.jobTitle || item.jobDescription}
+                    >
+                      {item.jobTitle || "Phân tích chung"}
+                    </p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {item.companyName ||
+                        `JD: ${item.jobDescription.substring(0, 50)}...`}
+                    </p>
+                  </div>
+                  <span className="text-sm text-muted-foreground mt-1 md:mt-0 md:ml-4">
                     {format(new Date(item.createdAt), "dd/MM/yyyy")}
                   </span>
                 </div>
@@ -98,6 +145,48 @@ export const AnalysisHistory = ({ resumeId }) => {
                     ))}
                   </ul>
                 </div>
+                <CardFooter className="p-0 pt-4 flex justify-end gap-2">
+                  {item.sourceType === "JSearch" && item.jobUrl && (
+                    <Button variant="outline" size="sm" asChild>
+                      <a
+                        href={item.jobUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Xem Job gốc
+                      </a>
+                    </Button>
+                  )}
+                  {/* Nút xóa và hộp thoại xác nhận */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Xóa
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Bạn có chắc chắn muốn xóa?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Hành động này không thể hoàn tác. Phân tích cho vị trí
+                          "{item.jobTitle || "này"}" sẽ bị xóa vĩnh viễn.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          Xóa
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </CardFooter>
               </AccordionContent>
             </AccordionItem>
           ))}

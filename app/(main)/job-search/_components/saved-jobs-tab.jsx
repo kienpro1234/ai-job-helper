@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { deleteSavedJob } from "@/actions/job";
 import {
   Card,
@@ -11,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { generateCoverLetter } from "@/actions/cover-letter";
 import { Button } from "@/components/ui/button";
 import {
   Trash2,
@@ -19,6 +21,8 @@ import {
   MapPin,
   Globe,
   FileScan,
+  Loader2,
+  PenBox,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -37,6 +41,10 @@ import { ResumeSelectionModal } from "./ResumeSelectionModal";
 export default function SavedJobsTab({ initialSavedJobs }) {
   const [savedJobs, setSavedJobs] = useState(initialSavedJobs);
   const [selectedJob, setSelectedJob] = useState(null);
+  const router = useRouter();
+
+  // State để theo dõi việc tạo cover letter cho job
+  const [generatingLetterId, setGeneratingLetterId] = useState(null);
 
   const handleDelete = async (id) => {
     const result = await deleteSavedJob(id);
@@ -45,6 +53,40 @@ export default function SavedJobsTab({ initialSavedJobs }) {
       toast.success("Job removed successfully!");
     } else {
       toast.error("Failed to remove job.");
+    }
+  };
+
+  const handleGenerateCoverLetter = async (job) => {
+    setGeneratingLetterId(job.id);
+    const toastId = toast.loading(
+      `Đang tạo cover letter cho vị trí ${job.title}...`
+    );
+
+    try {
+      const newCoverLetter = await generateCoverLetter({
+        jobTitle: job.title,
+        companyName: job.companyName,
+        jobDescription: job.description,
+
+        url: job.url,
+        source: job.source,
+        sourceType: job.sourceType,
+      });
+
+      toast.success("Tạo cover letter thành công!", {
+        id: toastId,
+        action: {
+          label: "Xem ngay",
+          onClick: () => router.push(`/ai-cover-letter/${newCoverLetter.id}`),
+        },
+      });
+      router.refresh();
+    } catch (error) {
+      toast.error(error.message || "Tạo cover letter thất bại.", {
+        id: toastId,
+      });
+    } finally {
+      setGeneratingLetterId(null);
     }
   };
 
@@ -134,6 +176,20 @@ export default function SavedJobsTab({ initialSavedJobs }) {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => handleGenerateCoverLetter(job)}
+                disabled={generatingLetterId === job.id}
+                className={job.sourceType !== "JSearch" ? "col-span-2" : ""}
+              >
+                {generatingLetterId === job.id ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <PenBox />
+                )}
+                Tạo Cover Letter
+              </Button>
             </div>
           </CardFooter>
         </Card>

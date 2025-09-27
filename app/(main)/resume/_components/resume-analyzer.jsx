@@ -18,32 +18,60 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, ListX, Loader2, Save } from "lucide-react";
+import { CheckCircle, ListX, Loader2, Save, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // Đặt component này ở đâu đó bên trong component ResumePage
-const ResumeAnalyzer = ({ resumeId, initialJd = "" }) => {
+const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
+  const router = useRouter();
   const [jobDescription, setJobDescription] = useState(initialJd || "");
   const [analysisResult, setAnalysisResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // const handleSave = async () => {
+  //   if (!analysisResult) return;
+  //   setIsSaving(true);
+  //   // Truyền resumeId vào action
+  //   const result = await saveResumeAnalysis(
+  //     analysisResult,
+  //     jobDescription,
+  //     resumeId
+  //   );
+  //   setIsSaving(false);
+  //   if (result.error) {
+  //     toast.error(result.error);
+  //   } else {
+  //     toast.success("Đã lưu kết quả phân tích!");
+  //   }
+  // };
   const handleSave = async () => {
     if (!analysisResult) return;
     setIsSaving(true);
-    // Truyền resumeId vào action
+    // Truyền `job` (có thể là null) vào action
     const result = await saveResumeAnalysis(
       analysisResult,
       jobDescription,
-      resumeId
+      resumeId,
+      job
     );
     setIsSaving(false);
+
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success("Đã lưu kết quả phân tích!");
+      // Hiển thị popup với nút điều hướng
+      toast.success("Đã lưu kết quả phân tích!", {
+        action: {
+          label: "Xem lịch sử",
+          onClick: () => router.push(`/resume/${resumeId}`),
+        },
+      });
+      // Đóng dialog sau khi lưu thành công
+      setIsDialogOpen(false);
     }
   };
 

@@ -163,6 +163,7 @@ export function ResumeSelectionModal({ job, open, onOpenChange }) {
           <ResumeAnalyzer
             resumeId={selectedResume.id}
             initialJd={job.description}
+            job={job}
           />
         </div>
       );

@@ -55,6 +55,10 @@ export async function generateCoverLetter(data) {
         jobTitle: data.jobTitle,
         status: "completed",
         userId: user.id,
+
+        jobUrl: data.url,
+        jobSource: data.source,
+        sourceType: data.sourceType,
       },
     });
 

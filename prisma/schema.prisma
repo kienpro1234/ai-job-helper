@@ -78,6 +78,14 @@ model ResumeAnalysis {
   summary         String   @db.Text
   suggestions     String[]
 
+
+//Những trường này phục vụ cho việc lưu trữ chi tiết kết quả phân tích cv
+  jobTitle        String?  // Tiêu đề công việc
+  companyName     String?  // Tên công ty
+  jobSource       String?  // Nguồn (topcv.vn, linkedin.com, etc.)
+  jobUrl          String?  // URL để xem chi tiết job
+  sourceType      String?  // Nguồn gốc (JSearch, Google Search)
+
   createdAt       DateTime @default(now())
 
   @@index([userId])
@@ -92,6 +100,11 @@ model CoverLetter {
   companyName     String    // Name of the company applying to
   jobTitle        String    // Position applying for
   status          String    @default("draft") // draft, completed
+
+  jobUrl          String?   // URL để xem chi tiết job
+  jobSource       String?   // Nguồn (topcv.vn, etc.)
+  sourceType      String?   // Nguồn gốc (JSearch, Google Search)
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

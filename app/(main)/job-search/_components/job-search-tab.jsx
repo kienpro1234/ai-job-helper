@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { searchJobs, saveJob } from "@/actions/job";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { generateCoverLetter } from "@/actions/cover-letter";
 import {
   Card,
   CardContent,
@@ -25,6 +27,7 @@ import {
   MapPin,
   Globe,
   FileScan,
+  PenBox,
 } from "lucide-react";
 import { ResumeSelectionModal } from "./ResumeSelectionModal";
 
@@ -36,6 +39,10 @@ export default function JobSearchTab() {
   const [currentQuery, setCurrentQuery] = useState("");
   const { register, handleSubmit, getValues } = useForm();
   const [selectedJob, setSelectedJob] = useState(null);
+  const router = useRouter();
+
+  // State để theo dõi việc tạo cover letter cho job nào
+  const [generatingLetterId, setGeneratingLetterId] = useState(null);
 
   const handleNewSearch = async (data) => {
     setIsLoading(true);
@@ -81,6 +88,40 @@ export default function JobSearchTab() {
     });
   };
 
+  const handleGenerateCoverLetter = async (job) => {
+    setGeneratingLetterId(job.id);
+    const toastId = toast.loading(
+      `Đang tạo cover letter cho vị trí ${job.title}...`
+    );
+
+    try {
+      const newCoverLetter = await generateCoverLetter({
+        jobTitle: job.title,
+        companyName: job.companyName,
+        jobDescription: job.description,
+
+        url: job.url,
+        source: job.source,
+        sourceType: job.sourceType,
+      });
+
+      toast.success("Tạo cover letter thành công!", {
+        id: toastId,
+        action: {
+          label: "Xem ngay",
+          onClick: () => router.push(`/ai-cover-letter/${newCoverLetter.id}`),
+        },
+      });
+      router.refresh();
+    } catch (error) {
+      toast.error(error.message || "Tạo cover letter thất bại.", {
+        id: toastId,
+      });
+    } finally {
+      setGeneratingLetterId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit(handleNewSearch)} className="flex gap-2">
@@ -99,7 +140,7 @@ export default function JobSearchTab() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {jobs.map((job, index) => (
-          <Card key={`${job.id}-${index}`}>
+          <Card key={`${job.id}-${index}`} className="flex flex-col">
             <CardHeader>
               <CardTitle>{job.title}</CardTitle>
               <CardDescription className="flex flex-col gap-1 pt-2">
@@ -116,12 +157,12 @@ export default function JobSearchTab() {
                 )}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-grow">
               <p className="text-sm text-muted-foreground line-clamp-3">
                 {job.description}
               </p>
             </CardContent>
-            <CardFooter className="flex justify-between items-center">
+            <CardFooter className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-end gap-2">
               {job.sourceType === "JSearch" ? (
                 <Badge
                   variant="secondary"
@@ -132,7 +173,7 @@ export default function JobSearchTab() {
               ) : (
                 <Badge variant="outline">Google Search</Badge>
               )}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap justify-end gap-2">
                 <Button variant="ghost" size="sm" asChild>
                   <a href={job.url} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4 mr-2" />
@@ -153,6 +194,19 @@ export default function JobSearchTab() {
                     Đánh giá CV
                   </Button>
                 )}
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => handleGenerateCoverLetter(job)}
+                  disabled={generatingLetterId === job.id}
+                >
+                  {generatingLetterId === job.id ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <PenBox />
+                  )}
+                  Tạo Cover Letter
+                </Button>
               </div>
             </CardFooter>
           </Card>

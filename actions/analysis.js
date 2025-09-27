@@ -25,7 +25,8 @@ export const getAnalysisHistory = async (resumeId) => {
 export const saveResumeAnalysis = async (
   analysisData,
   jobDescription,
-  resumeId
+  resumeId,
+  jobDetails = {}
 ) => {
   const user = await checkUser();
   if (!user) throw new Error("Unauthorized");
@@ -42,12 +43,41 @@ export const saveResumeAnalysis = async (
         missingKeywords: analysisData.missingKeywords,
         summary: analysisData.summary,
         suggestions: analysisData.suggestions,
+
+        jobTitle: jobDetails.title,
+        companyName: jobDetails.companyName,
+        jobSource: jobDetails.source,
+        jobUrl: jobDetails.url,
+        sourceType: jobDetails.sourceType,
       },
     });
     return { success: true, data: savedAnalysis };
   } catch (error) {
     console.error("Lỗi khi lưu kết quả phân tích:", error);
     return { error: "Không thể lưu kết quả phân tích." };
+  }
+};
+
+export const deleteResumeAnalysis = async (analysisId) => {
+  const user = await checkUser();
+  if (!user) throw new Error("Unauthorized");
+
+  if (!analysisId) {
+    return { error: "Analysis ID is required." };
+  }
+
+  try {
+    await db.resumeAnalysis.delete({
+      where: {
+        id: analysisId,
+        // Đảm bảo người dùng chỉ có thể xóa phân tích của chính họ
+        userId: user.id,
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Lỗi khi xóa kết quả phân tích:", error);
+    return { error: "Không thể xóa kết quả phân tích." };
   }
 };
 
