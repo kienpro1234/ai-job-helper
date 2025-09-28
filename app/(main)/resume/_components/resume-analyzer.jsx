@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, ListX, Loader2, Save, ArrowRight } from "lucide-react";
+import { CheckCircle, ListX, Loader2, Save } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -27,50 +27,39 @@ import { useRouter } from "next/navigation";
 const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
   const router = useRouter();
   const [jobDescription, setJobDescription] = useState(initialJd || "");
+  // State này giờ sẽ lưu cả generalAnalysis và inlineFeedback
   const [analysisResult, setAnalysisResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // const handleSave = async () => {
-  //   if (!analysisResult) return;
-  //   setIsSaving(true);
-  //   // Truyền resumeId vào action
-  //   const result = await saveResumeAnalysis(
-  //     analysisResult,
-  //     jobDescription,
-  //     resumeId
-  //   );
-  //   setIsSaving(false);
-  //   if (result.error) {
-  //     toast.error(result.error);
-  //   } else {
-  //     toast.success("Đã lưu kết quả phân tích!");
-  //   }
-  // };
   const handleSave = async () => {
-    if (!analysisResult) return;
+    // Phải có cả 2 loại kết quả mới cho lưu
+    if (!analysisResult?.generalAnalysis || !analysisResult?.inlineFeedback)
+      return;
+
     setIsSaving(true);
-    // Truyền `job` (có thể là null) vào action
+
+    // Truyền cả 2 loại kết quả vào action
     const result = await saveResumeAnalysis(
-      analysisResult,
+      analysisResult.generalAnalysis,
       jobDescription,
       resumeId,
-      job
+      job,
+      analysisResult.inlineFeedback // Dữ liệu mới
     );
+
     setIsSaving(false);
 
     if (result.error) {
       toast.error(result.error);
     } else {
-      // Hiển thị popup với nút điều hướng
       toast.success("Đã lưu kết quả phân tích!", {
         action: {
           label: "Xem lịch sử",
           onClick: () => router.push(`/resume/${resumeId}`),
         },
       });
-      // Đóng dialog sau khi lưu thành công
       setIsDialogOpen(false);
     }
   };
@@ -87,10 +76,14 @@ const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
     if (result.error) {
       toast.error(result.error);
     } else {
+      // Lưu toàn bộ kết quả trả về từ action
       setAnalysisResult(result.data);
       setIsDialogOpen(true); // Mở dialog khi có kết quả
     }
   };
+
+  // Lấy dữ liệu phân tích tổng quan để hiển thị
+  const generalAnalysis = analysisResult?.generalAnalysis;
 
   return (
     <Card className="mt-8">
@@ -122,15 +115,15 @@ const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
             <DialogTitle>Kết quả Phân tích CV</DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto pr-6 -mr-6">
-            {analysisResult && (
+            {generalAnalysis && (
               <div className="space-y-4">
                 <div className="text-center">
                   <h3 className="text-lg font-semibold">Điểm tương thích</h3>
                   <p className="text-5xl font-bold text-primary">
-                    {analysisResult.matchScore}/100
+                    {generalAnalysis.matchScore}/100
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {analysisResult.summary}
+                    {generalAnalysis.summary}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -143,7 +136,7 @@ const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-2">
-                        {analysisResult.missingKeywords.map(
+                        {generalAnalysis.missingKeywords.map(
                           (keyword, index) => (
                             <Badge key={index} variant="destructive">
                               {keyword}
@@ -162,11 +155,13 @@ const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
                     </CardHeader>
                     <CardContent>
                       <ul className="list-disc pl-5 space-y-1">
-                        {analysisResult.suggestions.map((suggestion, index) => (
-                          <li key={index} className="text-sm">
-                            {suggestion}
-                          </li>
-                        ))}
+                        {generalAnalysis.suggestions.map(
+                          (suggestion, index) => (
+                            <li key={index} className="text-sm">
+                              {suggestion}
+                            </li>
+                          )
+                        )}
                       </ul>
                     </CardContent>
                   </Card>

@@ -5,11 +5,12 @@ import { Toaster } from "sonner";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { dark } from "@clerk/themes";
+// import ProgressBarProvider from "@/components/progress-bar-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "AI Career Coach",
+  title: "Personal AI Career Assistant",
   description: "",
 };
 
@@ -34,6 +35,11 @@ export default function RootLayout({ children }) {
             <Header />
             <main className="min-h-screen">{children}</main>
             <Toaster richColors />
+            {/* <ProgressBarProvider>
+              <Header />
+              <main className="min-h-screen">{children}</main>
+              <Toaster richColors />
+            </ProgressBarProvider> */}
           </ThemeProvider>
         </body>
       </html>

@@ -78,6 +78,8 @@ model ResumeAnalysis {
   summary         String   @db.Text
   suggestions     String[]
 
+  inlineFeedback  Json?    // Lưu nhận xét trực quan dưới dạng JSON
+
 
 //Những trường này phục vụ cho việc lưu trữ chi tiết kết quả phân tích cv
   jobTitle        String?  // Tiêu đề công việc

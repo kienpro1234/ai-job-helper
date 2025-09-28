@@ -31,12 +31,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ExternalLink, Trash2, MessageSquareQuote } from "lucide-react";
 import { toast } from "sonner";
+import { InlineFeedbackDialog } from "./inline-feedback-dialog";
 
 export const AnalysisHistory = ({ resumeId }) => {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedAnalysis, setSelectedAnalysis] = useState(null);
 
   useEffect(() => {
     if (resumeId) {
@@ -76,122 +78,134 @@ export const AnalysisHistory = ({ resumeId }) => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Lịch sử Phân tích CV</CardTitle>
-        <CardDescription>
-          Đây là danh sách các lần phân tích bạn đã lưu cho CV này.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Accordion type="single" collapsible className="w-full">
-          {history.map((item) => (
-            <AccordionItem value={item.id} key={item.id}>
-              <AccordionTrigger>
-                {/* <div className="flex justify-between w-full pr-4">
-                  <span
-                    className="truncate max-w-xs md:max-w-md"
-                    title={item.jobDescription}
-                  >
-                    {item.jobDescription}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {format(new Date(item.createdAt), "dd/MM/yyyy")}
-                  </span>
-                </div> */}
-                <div className="flex flex-col md:flex-row justify-between w-full pr-4 text-left">
-                  {/* === HIỂN THỊ TIÊU ĐỀ JOB VÀ CÔNG TY === */}
-                  <div className="flex-1 truncate">
-                    <p
-                      className="font-semibold truncate"
-                      title={item.jobTitle || item.jobDescription}
-                    >
-                      {item.jobTitle || "Phân tích chung"}
-                    </p>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {item.companyName ||
-                        `JD: ${item.jobDescription.substring(0, 50)}...`}
-                    </p>
-                  </div>
-                  <span className="text-sm text-muted-foreground mt-1 md:mt-0 md:ml-4">
-                    {format(new Date(item.createdAt), "dd/MM/yyyy")}
-                  </span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-4">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-primary">
-                    {item.matchScore}/100
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {item.summary}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-2">Từ khóa còn thiếu:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {item.missingKeywords.map((keyword, index) => (
-                      <Badge key={index} variant="destructive">
-                        {keyword}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-2">Gợi ý cải thiện:</h4>
-                  <ul className="list-disc pl-5 space-y-1 text-sm">
-                    {item.suggestions.map((suggestion, index) => (
-                      <li key={index}>{suggestion}</li>
-                    ))}
-                  </ul>
-                </div>
-                <CardFooter className="p-0 pt-4 flex justify-end gap-2">
-                  {item.sourceType === "JSearch" && item.jobUrl && (
-                    <Button variant="outline" size="sm" asChild>
-                      <a
-                        href={item.jobUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Lịch sử Phân tích CV</CardTitle>
+          <CardDescription>
+            Đây là danh sách các lần phân tích bạn đã lưu cho CV này.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="single" collapsible className="w-full">
+            {history.map((item) => (
+              <AccordionItem value={item.id} key={item.id}>
+                <AccordionTrigger>
+                  <div className="flex flex-col md:flex-row justify-between w-full pr-4 text-left">
+                    {/* === HIỂN THỊ TIÊU ĐỀ JOB VÀ CÔNG TY === */}
+                    <div className="flex-1 truncate">
+                      <p
+                        className="font-semibold truncate"
+                        title={item.jobTitle || item.jobDescription}
                       >
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        Xem Job gốc
-                      </a>
-                    </Button>
-                  )}
-                  {/* Nút xóa và hộp thoại xác nhận */}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Xóa
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Bạn có chắc chắn muốn xóa?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Hành động này không thể hoàn tác. Phân tích cho vị trí
-                          "{item.jobTitle || "này"}" sẽ bị xóa vĩnh viễn.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Hủy</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(item.id)}
+                        {item.jobTitle || "Phân tích chung"}
+                      </p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {item.companyName ||
+                          `JD: ${item.jobDescription.substring(0, 50)}...`}
+                      </p>
+                    </div>
+                    <span className="text-sm text-muted-foreground mt-1 md:mt-0 md:ml-4">
+                      {format(new Date(item.createdAt), "dd/MM/yyyy")}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-primary">
+                      {item.matchScore}/100
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {item.summary}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Từ khóa còn thiếu:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {item.missingKeywords.map((keyword, index) => (
+                        <Badge key={index} variant="destructive">
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Gợi ý cải thiện:</h4>
+                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                      {item.suggestions.map((suggestion, index) => (
+                        <li key={index}>{suggestion}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <CardFooter className="p-0 pt-4 flex justify-end gap-2">
+                    {item.sourceType === "JSearch" && item.jobUrl && (
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={item.jobUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Xem Job gốc
+                        </a>
+                      </Button>
+                    )}
+                    {/* THAY ĐỔI Ở ĐÂY: Chỉ hiển thị nút nếu có inlineFeedback */}
+                    {item.inlineFeedback &&
+                      Object.keys(item.inlineFeedback).length > 0 && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => setSelectedAnalysis(item)}
+                        >
+                          <MessageSquareQuote className="mr-2 h-4 w-4" />
+                          Xem nhận xét trực quan
+                        </Button>
+                      )}
+                    {/* Nút xóa và hộp thoại xác nhận */}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm">
+                          <Trash2 className="mr-2 h-4 w-4" />
                           Xóa
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </CardFooter>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </CardContent>
-    </Card>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Bạn có chắc chắn muốn xóa?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Hành động này không thể hoàn tác. Phân tích cho vị
+                            trí "{item.jobTitle || "này"}" sẽ bị xóa vĩnh viễn.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Hủy</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            Xóa
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </CardFooter>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
+      <InlineFeedbackDialog
+        analysis={selectedAnalysis}
+        open={!!selectedAnalysis}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setSelectedAnalysis(null);
+          }
+        }}
+      />
+    </>
   );
 };
