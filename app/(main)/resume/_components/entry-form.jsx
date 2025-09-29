@@ -21,14 +21,35 @@ import { improveWithAI } from "@/actions/resume";
 import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
 
+// Helper to parse date string from form (e.g., "2023-05") to display format ("May 2023")
 const formatDisplayDate = (dateString) => {
-  if (!dateString) return "";
-  const date = parse(dateString, "yyyy-MM", new Date());
-  return format(date, "MMM yyyy");
+  if (!dateString || typeof dateString !== "string") return "";
+  // If it's already in "MMM yyyy" format, return it
+  if (/^[A-Za-z]{3}\s\d{4}$/.test(dateString)) return dateString;
+  // Otherwise, parse it from "yyyy-MM"
+  try {
+    const date = parse(dateString, "yyyy-MM", new Date());
+    return format(date, "MMM yyyy");
+  } catch (e) {
+    return dateString; // Return original if parsing fails
+  }
+};
+
+// Helper to convert display format back to form format for editing
+const parseToFormDate = (dateString) => {
+  if (!dateString || typeof dateString !== "string") return "";
+  try {
+    const date = parse(dateString, "MMM yyyy", new Date());
+    return format(date, "yyyy-MM");
+  } catch (e) {
+    return ""; // Return empty if parsing fails
+  }
 };
 
 export function EntryForm({ type, entries, onChange }) {
-  const [isAdding, setIsAdding] = useState(false);
+  // State to track if the user is adding a new entry or editing an existing one
+  // null = not editing/adding, -1 = adding, index = editing
+  const [editIndex, setEditIndex] = useState(null);
 
   const {
     register,
@@ -51,17 +72,53 @@ export function EntryForm({ type, entries, onChange }) {
 
   const current = watch("current");
 
-  const handleAdd = handleValidation((data) => {
+  // Handlers for starting to add or edit
+  const handleAddNew = () => {
+    reset({
+      title: "",
+      organization: "",
+      startDate: "",
+      endDate: "",
+      description: "",
+      current: false,
+    });
+    setEditIndex(-1); // Use -1 to signify "adding new"
+  };
+
+  const handleEdit = (index) => {
+    const entryToEdit = entries[index];
+    reset({
+      ...entryToEdit,
+      startDate: parseToFormDate(entryToEdit.startDate),
+      endDate: parseToFormDate(entryToEdit.endDate),
+    });
+    setEditIndex(index);
+  };
+
+  const handleCancel = () => {
+    // reset();
+    setEditIndex(null);
+  };
+
+  // Handle form submission (for both add and edit)
+  const onSubmit = handleValidation((data) => {
     const formattedEntry = {
       ...data,
       startDate: formatDisplayDate(data.startDate),
       endDate: data.current ? "" : formatDisplayDate(data.endDate),
     };
 
-    onChange([...entries, formattedEntry]);
+    const newEntries = [...entries];
+    if (editIndex === -1) {
+      // Adding a new entry
+      newEntries.push(formattedEntry);
+    } else {
+      // Updating an existing entry
+      newEntries[editIndex] = formattedEntry;
+    }
 
-    reset();
-    setIsAdding(false);
+    onChange(newEntries);
+    handleCancel(); // Close form after submission
   });
 
   const handleDelete = (index) => {
@@ -69,6 +126,7 @@ export function EntryForm({ type, entries, onChange }) {
     onChange(newEntries);
   };
 
+  // AI Improvement Logic (no changes here)
   const {
     loading: isImproving,
     fn: improveWithAIFn,
@@ -76,22 +134,16 @@ export function EntryForm({ type, entries, onChange }) {
     error: improveError,
   } = useFetch(improveWithAI);
 
-  // Add this effect to handle the improvement result
   useEffect(() => {
-    // Sửa ở đây:
-    // Vì action `improveWithAI` trả về một chuỗi, nên `improvedContent` chính là chuỗi đó.
-    // Chúng ta chỉ cần kiểm tra xem chuỗi này có tồn tại và có nội dung hay không.
     if (
       improvedContent &&
       typeof improvedContent === "string" &&
       improvedContent.trim() !== "" &&
       !isImproving
     ) {
-      setValue("description", improvedContent); // Gán trực tiếp chuỗi này vào
+      setValue("description", improvedContent);
       toast.success("Description improved successfully!");
-    }
-    // Nếu AI trả về một chuỗi rỗng
-    else if (improvedContent !== undefined && !isImproving) {
+    } else if (improvedContent !== undefined && !isImproving) {
       toast.error(
         "AI could not improve the text. Please try rephrasing or adding more details."
       );
@@ -102,7 +154,6 @@ export function EntryForm({ type, entries, onChange }) {
     }
   }, [improvedContent, improveError, isImproving, setValue]);
 
-  // Replace handleImproveDescription with this
   const handleImproveDescription = async () => {
     const description = watch("description");
     if (!description) {
@@ -112,12 +163,16 @@ export function EntryForm({ type, entries, onChange }) {
 
     await improveWithAIFn({
       current: description,
-      type: type.toLowerCase(), // 'experience', 'education', or 'project'
+      type: type.toLowerCase(),
     });
   };
 
+  // Show the form if we are adding or editing
+  const isFormVisible = editIndex !== null;
+
   return (
     <div className="space-y-4">
+      {/* Display existing entries */}
       <div className="space-y-4">
         {entries.map((item, index) => (
           <Card key={index}>
@@ -125,14 +180,24 @@ export function EntryForm({ type, entries, onChange }) {
               <CardTitle className="text-sm font-medium">
                 {item.title} @ {item.organization}
               </CardTitle>
-              <Button
-                variant="outline"
-                size="icon"
-                type="button"
-                onClick={() => handleDelete(index)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  onClick={() => handleEdit(index)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  onClick={() => handleDelete(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
@@ -148,10 +213,13 @@ export function EntryForm({ type, entries, onChange }) {
         ))}
       </div>
 
-      {isAdding && (
+      {/* Form for adding/editing */}
+      {isFormVisible && (
         <Card>
           <CardHeader>
-            <CardTitle>Add {type}</CardTitle>
+            <CardTitle>
+              {editIndex === -1 ? "Add" : "Edit"} {type}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -210,16 +278,10 @@ export function EntryForm({ type, entries, onChange }) {
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                id="current"
+                id={`current-${type}`}
                 {...register("current")}
-                onChange={(e) => {
-                  setValue("current", e.target.checked);
-                  if (e.target.checked) {
-                    setValue("endDate", "");
-                  }
-                }}
               />
-              <label htmlFor="current">Current {type}</label>
+              <label htmlFor={`current-${type}`}>Current {type}</label>
             </div>
 
             <div className="space-y-2">
@@ -256,30 +318,20 @@ export function EntryForm({ type, entries, onChange }) {
             </Button>
           </CardContent>
           <CardFooter className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                reset();
-                setIsAdding(false);
-              }}
-            >
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="button" onClick={handleAdd}>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add Entry
+            <Button type="button" onClick={onSubmit}>
+              <Save className="h-4 w-4 mr-2" />
+              {editIndex === -1 ? "Add Entry" : "Save Changes"}
             </Button>
           </CardFooter>
         </Card>
       )}
 
-      {!isAdding && (
-        <Button
-          className="w-full"
-          variant="outline"
-          onClick={() => setIsAdding(true)}
-        >
+      {/* Show "Add" button only when the form is hidden */}
+      {!isFormVisible && (
+        <Button className="w-full" variant="outline" onClick={handleAddNew}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Add {type}
         </Button>

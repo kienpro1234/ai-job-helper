@@ -11,6 +11,7 @@ import {
   Loader2,
   Monitor,
   Save,
+  Sparkles, // Import Sparkles icon
 } from "lucide-react";
 import { toast } from "sonner";
 import MDEditor from "@uiw/react-md-editor";
@@ -19,28 +20,37 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { createResume, saveResume } from "@/actions/resume";
+import { createResume, improveWithAI, updateResume } from "@/actions/resume"; // Import improveWithAI
 import { EntryForm } from "./entry-form";
 import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/nextjs";
-import { entriesToMarkdown } from "@/app/lib/helper";
 import { resumeSchema } from "@/app/lib/schema";
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 import { Label } from "@/components/ui/label";
 import "../resume-styles.css";
 
-export default function ResumeBuilder({ initialContent }) {
+export default function ResumeBuilder({
+  initialContent,
+  initialData,
+  resumeId,
+}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("edit");
   const [previewContent, setPreviewContent] = useState(initialContent);
   const { user } = useUser();
   const [resumeMode, setResumeMode] = useState("preview");
 
+  // State để theo dõi mục nào đang được AI cải thiện
+  const [improvingSection, setImprovingSection] = useState(null);
+
   const {
     control,
     register,
     handleSubmit,
     watch,
+    setValue,
+    reset,
+    getValues, // Get getValues to read form state
     formState: { errors },
   } = useForm({
     resolver: zodResolver(resumeSchema),
@@ -59,16 +69,38 @@ export default function ResumeBuilder({ initialContent }) {
     fn: saveResumeFn,
     data: saveResult,
     error: saveError,
-  } = useFetch(createResume); // <-- Dùng createResume thay vì saveResume cũ
+  } = useFetch(createResume);
 
-  // Watch form fields for preview updates
+  const { loading: isUpdating, fn: updateResumeFn } = useFetch(updateResume);
+
+  // New fetch hook for AI improvement
+  const {
+    loading: isImproving,
+    fn: improveWithAIFn,
+    data: improvedContent,
+  } = useFetch(improveWithAI);
+
   const formValues = watch();
 
   useEffect(() => {
-    if (initialContent) setActiveTab("preview");
-  }, [initialContent]);
+    if (initialData) {
+      // Đặt lại form với dữ liệu ban đầu khi ở chế độ chỉnh sửa
+      reset({
+        title: initialData.title || "",
+        contactInfo: initialData.contactInfo || {},
+        summary: initialData.summary || "",
+        skills: initialData.skills || "",
+        experience: initialData.experience || [],
+        education: initialData.education || [],
+        projects: initialData.projects || [],
+      });
+    }
+    if (initialContent) {
+      // Vẫn giữ lại việc cập nhật preview content
+      setPreviewContent(initialContent);
+    }
+  }, [initialContent, initialData, reset]);
 
-  // Update preview content when form values change
   useEffect(() => {
     if (activeTab === "edit") {
       const newContent = getCombinedContent();
@@ -76,11 +108,9 @@ export default function ResumeBuilder({ initialContent }) {
     }
   }, [formValues, activeTab]);
 
-  // Handle save result
   useEffect(() => {
     if (saveResult && !isSaving) {
       toast.success(`Đã lưu CV "${saveResult.title}"!`);
-      // Chuyển người dùng đến trang chi tiết CV vừa tạo
       router.push(`/resume/${saveResult.id}`);
     }
     if (saveError) {
@@ -88,7 +118,38 @@ export default function ResumeBuilder({ initialContent }) {
     }
   }, [saveResult, saveError, isSaving]);
 
-  // Hiển thị
+  // SỬA LỖI 2: Dùng useEffect để xử lý kết quả từ AI
+  useEffect(() => {
+    if (!isImproving && improvedContent && improvingSection) {
+      if (
+        typeof improvedContent === "string" &&
+        improvedContent.trim() !== ""
+      ) {
+        setValue(improvingSection, improvedContent, { shouldValidate: true });
+        toast.success(`Mục ${improvingSection} đã được cải thiện!`);
+      } else {
+        toast.error(
+          "AI không thể cải thiện văn bản. Vui lòng thử lại với nội dung chi tiết hơn."
+        );
+      }
+      setImprovingSection(null); // Reset lại mục đang cải thiện
+    }
+  }, [improvedContent, isImproving, improvingSection, setValue]);
+
+  // Handle AI improvement for a given section
+
+  const handleImproveSection = async (section) => {
+    const currentValue = getValues(section);
+    if (!currentValue) {
+      toast.error(`Vui lòng nhập nội dung cho mục ${section} trước.`);
+      return;
+    }
+    setImprovingSection(section); // Đánh dấu mục đang được cải thiện
+    await improveWithAIFn({
+      current: currentValue,
+      type: section,
+    });
+  };
 
   const getContactMarkdown = () => {
     const { contactInfo } = formValues;
@@ -119,7 +180,6 @@ export default function ResumeBuilder({ initialContent }) {
       );
     }
 
-    // Cấu trúc này sẽ đảm bảo h1 và div.contact-info được style đúng bởi file CSS
     return `
 <h1 class="resume-name">${user?.fullName || "Your Name"}</h1>
 <div class="contact-info">
@@ -130,18 +190,10 @@ export default function ResumeBuilder({ initialContent }) {
 
   const getCombinedContent = () => {
     const { summary, skills, experience, education, projects } = formValues;
-
-    // Helper nội bộ để thêm icon và đường kẻ
-    const createSection = (title, icon, content) => {
-      if (!content || content.trim() === "") return "";
-      // Thêm đường kẻ ngang <hr> trước mỗi mục (trừ mục đầu tiên)
-      // return `\n\n<hr>\n\n## ${icon} ${title}\n\n${content}`;
-      return `\n\n## ${icon} ${title}\n\n${content}`;
-    };
-
-    // Helper để format lại markdown cho các mục có entry
+    const createSection = (title, icon, content) =>
+      content?.trim() ? `## ${icon} ${title}\n\n${content}` : "";
     const formatEntries = (entries, type, icon) => {
-      if (!entries || entries.length === 0) return "";
+      if (!entries?.length) return "";
       const title = `## ${icon} ${type}`;
       const content = entries
         .map((entry) => {
@@ -151,22 +203,17 @@ export default function ResumeBuilder({ initialContent }) {
           return `### **${entry.title}** at *${entry.organization}*\n${dateRange}\n\n${entry.description}`;
         })
         .join("\n\n");
-      // return `\n\n<hr>\n\n${title}\n\n${content}`;
-      return `\n\n${title}\n\n${content}`;
+      return `${title}\n\n${content}`;
     };
-
-    return [
-      getContactMarkdown(),
+    const sections = [
       createSection("Professional Summary", "📝", summary),
       createSection("Skills", "🔧", skills),
       formatEntries(experience, "Work Experience", "💼"),
       formatEntries(education, "Education", "🎓"),
       formatEntries(projects, "Projects", "🚀"),
-    ]
-      .filter(Boolean)
-      .join(""); // Nối trực tiếp không cần "\n\n" vì đã có trong helper
+    ].filter(Boolean);
+    return [getContactMarkdown(), ...sections].join("\n\n<hr>\n\n");
   };
-
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generatePDF = async () => {
@@ -191,7 +238,16 @@ export default function ResumeBuilder({ initialContent }) {
 
   const onSubmit = async (data) => {
     const content = getCombinedContent();
-    await saveResumeFn(data.title, content);
+    if (resumeId) {
+      // Chế độ cập nhật
+      await updateResumeFn(resumeId, data.title, content);
+      toast.success(`Đã cập nhật CV "${data.title}"!`);
+      router.push(`/resume/${resumeId}`);
+      router.refresh();
+    } else {
+      // Chế độ tạo mới
+      await saveResumeFn(data.title, content);
+    }
   };
 
   return (
@@ -199,19 +255,23 @@ export default function ResumeBuilder({ initialContent }) {
       <div data-color-mode="light" className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-2">
           <h1 className="font-bold gradient-title text-5xl md:text-6xl">
-            Resume Builder
+            {resumeId ? "Chỉnh sửa CV" : "Resume Builder"}
           </h1>
           <div className="space-x-2">
-            <Button variant="default" disabled={isSaving} type="submit">
-              {isSaving ? (
+            <Button
+              variant="default"
+              disabled={isSaving || isUpdating}
+              type="submit"
+            >
+              {isSaving || isUpdating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  {isSaving ? "Đang lưu..." : "Đang cập nhật..."}
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4" />
-                  Save
+                  {resumeId ? "Cập nhật" : "Lưu"}
                 </>
               )}
             </Button>
@@ -237,8 +297,7 @@ export default function ResumeBuilder({ initialContent }) {
             <TabsTrigger value="preview">Markdown</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="edit">
-            {/* Contact Information */}
+          <TabsContent value="edit" className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Contact Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
@@ -249,6 +308,13 @@ export default function ResumeBuilder({ initialContent }) {
                     placeholder="Ví dụ: CV ứng tuyển vị trí Backend Developer"
                     {...register("title")}
                   />
+                  {errors.title && (
+                    <p className="text-sm text-red-500">
+                      {errors.title.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
                   <label className="text-sm font-medium">Email</label>
                   <Input
                     {...register("contactInfo.email")}
@@ -269,11 +335,6 @@ export default function ResumeBuilder({ initialContent }) {
                     type="tel"
                     placeholder="+1 234 567 8900"
                   />
-                  {errors.contactInfo?.mobile && (
-                    <p className="text-sm text-red-500">
-                      {errors.contactInfo.mobile.message}
-                    </p>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">LinkedIn URL</label>
@@ -282,11 +343,6 @@ export default function ResumeBuilder({ initialContent }) {
                     type="url"
                     placeholder="https://linkedin.com/in/your-profile"
                   />
-                  {errors.contactInfo?.linkedin && (
-                    <p className="text-sm text-red-500">
-                      {errors.contactInfo.linkedin.message}
-                    </p>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
@@ -297,18 +353,28 @@ export default function ResumeBuilder({ initialContent }) {
                     type="url"
                     placeholder="https://twitter.com/your-handle"
                   />
-                  {errors.contactInfo?.twitter && (
-                    <p className="text-sm text-red-500">
-                      {errors.contactInfo.twitter.message}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* Summary */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Professional Summary</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Professional Summary</h3>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleImproveSection("summary")}
+                  disabled={isImproving}
+                >
+                  {isImproving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  Improve with AI
+                </Button>
+              </div>
               <Controller
                 name="summary"
                 control={control}
@@ -317,7 +383,6 @@ export default function ResumeBuilder({ initialContent }) {
                     {...field}
                     className="h-32"
                     placeholder="Write a compelling professional summary..."
-                    error={errors.summary}
                   />
                 )}
               />
@@ -326,9 +391,24 @@ export default function ResumeBuilder({ initialContent }) {
               )}
             </div>
 
-            {/* Skills */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Skills</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Skills</h3>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleImproveSection("skills")}
+                  disabled={isImproving}
+                >
+                  {isImproving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  Improve with AI
+                </Button>
+              </div>
               <Controller
                 name="skills"
                 control={control}
@@ -337,7 +417,6 @@ export default function ResumeBuilder({ initialContent }) {
                     {...field}
                     className="h-32"
                     placeholder="List your key skills..."
-                    error={errors.skills}
                   />
                 )}
               />
@@ -346,7 +425,7 @@ export default function ResumeBuilder({ initialContent }) {
               )}
             </div>
 
-            {/* Experience */}
+            {/* Sections using EntryForm */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Work Experience</h3>
               <Controller
@@ -360,14 +439,7 @@ export default function ResumeBuilder({ initialContent }) {
                   />
                 )}
               />
-              {errors.experience && (
-                <p className="text-sm text-red-500">
-                  {errors.experience.message}
-                </p>
-              )}
             </div>
-
-            {/* Education */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Education</h3>
               <Controller
@@ -381,14 +453,7 @@ export default function ResumeBuilder({ initialContent }) {
                   />
                 )}
               />
-              {errors.education && (
-                <p className="text-sm text-red-500">
-                  {errors.education.message}
-                </p>
-              )}
             </div>
-
-            {/* Projects */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Projects</h3>
               <Controller
@@ -402,52 +467,16 @@ export default function ResumeBuilder({ initialContent }) {
                   />
                 )}
               />
-              {errors.projects && (
-                <p className="text-sm text-red-500">
-                  {errors.projects.message}
-                </p>
-              )}
             </div>
           </TabsContent>
 
           <TabsContent value="preview">
-            {activeTab === "preview" && (
-              <Button
-                variant="link"
-                type="button"
-                className="mb-2"
-                onClick={() =>
-                  setResumeMode(resumeMode === "preview" ? "edit" : "preview")
-                }
-              >
-                {resumeMode === "preview" ? (
-                  <>
-                    <Edit className="h-4 w-4" />
-                    Edit Resume
-                  </>
-                ) : (
-                  <>
-                    <Monitor className="h-4 w-4" />
-                    Show Preview
-                  </>
-                )}
-              </Button>
-            )}
-
-            {activeTab === "preview" && resumeMode !== "preview" && (
-              <div className="flex p-3 gap-2 items-center border-2 border-yellow-600 text-yellow-600 rounded mb-2">
-                <AlertTriangle className="h-5 w-5" />
-                <span className="text-sm">
-                  You will lose editied markdown if you update the form data.
-                </span>
-              </div>
-            )}
             <div className="resume-container">
               <MDEditor
                 value={previewContent}
                 onChange={setPreviewContent}
                 height={800}
-                preview={resumeMode}
+                preview="preview"
               />
             </div>
             <div className="pdf-render-offscreen">

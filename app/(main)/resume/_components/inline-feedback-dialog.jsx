@@ -1,21 +1,22 @@
+// app/(main)/resume/_components/inline-feedback-dialog.jsx
 "use client";
 
-// THÊM LẠI CÁC IMPORT NÀY
 import { useEffect, useState } from "react";
 import { getResume } from "@/actions/resume";
 import { toast } from "sonner";
-// =========================
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, MessageSquareQuote } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, MessageSquareQuote, Edit } from "lucide-react";
 import MDEditor from "@uiw/react-md-editor";
 import rehypeRaw from "rehype-raw";
+import { ResumeEditorWithFeedback } from "./resume-editor-with-feedback";
 import "../resume-styles.css";
 
 const FeedbackSection = ({ title, content }) => (
@@ -29,15 +30,12 @@ const FeedbackSection = ({ title, content }) => (
 );
 
 export function InlineFeedbackDialog({ analysis, open, onOpenChange }) {
-  // THÊM LẠI STATE ĐỂ QUẢN LÝ NỘI DUNG CV VÀ TRẠNG THÁI TẢI
   const [resumeContent, setResumeContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  // Nhận xét inline được lấy trực tiếp từ prop
-  const feedback = analysis?.inlineFeedback;
-
-  // THÊM LẠI useEffect ĐỂ TẢI NỘI DUNG CV KHI DIALOG MỞ
   useEffect(() => {
+    // Chỉ fetch dữ liệu khi dialog mở và chưa có nội dung
     if (open && analysis?.resumeId) {
       setIsLoading(true);
       getResume(analysis.resumeId)
@@ -51,8 +49,14 @@ export function InlineFeedbackDialog({ analysis, open, onOpenChange }) {
         })
         .finally(() => setIsLoading(false));
     }
+
+    // Reset về chế độ xem khi dialog đóng
+    if (!open) {
+      setIsEditMode(false);
+    }
   }, [open, analysis, onOpenChange]);
 
+  const feedback = analysis?.inlineFeedback;
   const resumeSections = resumeContent ? resumeContent.split(/\n(?=##\s)/) : [];
 
   const findFeedbackForSection = (sectionContent) => {
@@ -80,42 +84,63 @@ export function InlineFeedbackDialog({ analysis, open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>AI Inline Feedback</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Chỉnh sửa & Cải thiện CV" : "AI Inline Feedback"}
+          </DialogTitle>
           <DialogDescription>
-            AI comments on your CV for the position: "
-            {analysis?.jobTitle || "N/A"}"
+            {isEditMode
+              ? `Chỉnh sửa CV dựa trên gợi ý cho vị trí "${
+                  analysis?.jobTitle || "N/A"
+                }".`
+              : `Nhận xét của AI cho CV của bạn với vị trí "${
+                  analysis?.jobTitle || "N/A"
+                }".`}
           </DialogDescription>
         </DialogHeader>
         <div className="overflow-y-auto flex-grow pr-6 -mr-6">
           {isLoading ? (
             <div className="flex justify-center items-center h-full min-h-[400px]">
               <Loader2 className="animate-spin h-8 w-8 text-primary" />
-              <p className="ml-4">Loading resume content...</p>
+              <p className="ml-4">Đang tải nội dung CV...</p>
             </div>
+          ) : isEditMode ? (
+            <ResumeEditorWithFeedback
+              analysis={analysis}
+              initialContent={resumeContent} // <-- **SỬA Ở ĐÂY: Truyền nội dung CV đã fetch**
+              onSaveNew={() => onOpenChange(false)}
+            />
           ) : (
-            <div data-color-mode="light">
-              <div className="resume-container">
-                {resumeSections.map((section, index) => {
-                  const sectionFeedback = findFeedbackForSection(section);
-                  const sectionTitle = getSectionTitle(section);
-                  return (
-                    <div key={index}>
-                      <MDEditor.Markdown
-                        source={section}
-                        style={{ background: "white", color: "black" }}
-                        rehypePlugins={[rehypeRaw]}
-                      />
-                      {sectionFeedback && (
-                        <FeedbackSection
-                          title={sectionTitle}
-                          content={sectionFeedback}
+            <>
+              <div data-color-mode="light">
+                <div className="resume-container">
+                  {resumeSections.map((section, index) => {
+                    const sectionFeedback = findFeedbackForSection(section);
+                    const sectionTitle = getSectionTitle(section);
+                    return (
+                      <div key={index}>
+                        <MDEditor.Markdown
+                          source={section}
+                          style={{ background: "white", color: "black" }}
+                          rehypePlugins={[rehypeRaw]}
                         />
-                      )}
-                    </div>
-                  );
-                })}
+                        {sectionFeedback && (
+                          <FeedbackSection
+                            title={sectionTitle}
+                            content={sectionFeedback}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+              <DialogFooter className="pt-4 mt-4 border-t">
+                <Button onClick={() => setIsEditMode(true)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Chỉnh sửa & Cải thiện
+                </Button>
+              </DialogFooter>
+            </>
           )}
         </div>
       </DialogContent>

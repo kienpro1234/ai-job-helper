@@ -3,14 +3,16 @@
 import { useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, Edit } from "lucide-react";
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 import ResumeAnalyzer from "@/app/(main)/resume/_components/resume-analyzer";
 import rehypeRaw from "rehype-raw";
+import { useRouter } from "next/navigation";
 import "../resume-styles.css";
 // Tái sử dụng component analyzer
 
 export const ResumeViewer = ({ resume }) => {
+  const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generatePDF = async () => {
@@ -33,10 +35,19 @@ export const ResumeViewer = ({ resume }) => {
         <h1 className="font-bold gradient-title text-4xl md:text-5xl">
           {resume.title}
         </h1>
-        <Button onClick={generatePDF} disabled={isGenerating}>
-          {isGenerating ? <Loader2 className="animate-spin" /> : <Download />}
-          Download PDF
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={generatePDF} disabled={isGenerating}>
+            {/* ... */}
+            Download PDF
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.push(`/resume/edit/${resume.id}`)}
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            Chỉnh sửa
+          </Button>
+        </div>
       </div>
 
       {/* Phần hiển thị nội dung CV */}
