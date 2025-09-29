@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { revalidatePath } from "next/cache";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -117,10 +118,46 @@ export async function deleteCoverLetter(id) {
 
   if (!user) throw new Error("User not found");
 
-  return await db.coverLetter.delete({
-    where: {
-      id,
-      userId: user.id,
-    },
+  try {
+    await db.coverLetter.delete({
+      where: {
+        id,
+        userId: user.id,
+      },
+    });
+    revalidatePath("/ai-cover-letter");
+    return { success: true }; // Trả về object để client dễ xử lý
+  } catch (error) {
+    console.error("Lỗi xóa cover letter:", error);
+    return { success: false, error: "Không thể xóa cover letter." };
+  }
+}
+
+// HÀM MỚI ĐỂ XÓA HÀNG LOẠT
+export async function deleteMultipleCoverLetters(ids) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
   });
+
+  if (!user) throw new Error("User not found");
+
+  try {
+    await db.coverLetter.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        userId: user.id,
+      },
+    });
+
+    revalidatePath("/ai-cover-letter");
+    return { success: true };
+  } catch (error) {
+    console.error("Lỗi xóa nhiều cover letter:", error);
+    return { success: false, error: "Không thể xóa các cover letter đã chọn." };
+  }
 }

@@ -3,11 +3,23 @@
 import { useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Edit } from "lucide-react";
+import { Download, Loader2, Edit, Trash2 } from "lucide-react";
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 import ResumeAnalyzer from "@/app/(main)/resume/_components/resume-analyzer";
 import rehypeRaw from "rehype-raw";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { deleteResume } from "@/actions/resume";
 import "../resume-styles.css";
 // Tái sử dụng component analyzer
 
@@ -29,6 +41,18 @@ export const ResumeViewer = ({ resume }) => {
     setIsGenerating(false);
   };
 
+  const handleDelete = async () => {
+    toast.promise(deleteResume(resume.id), {
+      loading: "Đang xóa CV...",
+      success: () => {
+        router.push("/resume");
+        router.refresh(); // Đảm bảo trang danh sách được cập nhật
+        return "Đã xóa CV thành công!";
+      },
+      error: "Không thể xóa CV.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -47,11 +71,34 @@ export const ResumeViewer = ({ resume }) => {
             <Edit className="mr-2 h-4 w-4" />
             Chỉnh sửa
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Xóa
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Hành động này sẽ xóa vĩnh viễn CV "{resume.title}". Bạn không
+                  thể hoàn tác hành động này.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Xác nhận xóa
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
       {/* Phần hiển thị nội dung CV */}
-      {/* <div data-color-mode="light" className="border rounded-lg p-4"> */}
+
       <div data-color-mode="light" id={`resume-pdf`}>
         <div className="resume-container">
           <MDEditor.Markdown

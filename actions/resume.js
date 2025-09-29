@@ -66,6 +66,46 @@ export async function updateResume(id, title, content) {
   return updatedResume;
 }
 
+export async function deleteResume(id) {
+  const user = await checkUser();
+
+  try {
+    await db.resume.delete({
+      where: {
+        id: id,
+        userId: user.id, // Đảm bảo người dùng chỉ xóa CV của chính mình
+      },
+    });
+
+    revalidatePath("/resume"); // Làm mới lại danh sách CV
+    return { success: true };
+  } catch (error) {
+    console.error("Lỗi xóa CV:", error);
+    return { success: false, error: "Không thể xóa CV." };
+  }
+}
+
+export async function deleteMultipleResumes(ids) {
+  const user = await checkUser();
+
+  try {
+    await db.resume.deleteMany({
+      where: {
+        id: {
+          in: ids, // Xóa tất cả các CV có id trong danh sách ids
+        },
+        userId: user.id, // Đảm bảo an toàn
+      },
+    });
+
+    revalidatePath("/resume");
+    return { success: true };
+  } catch (error) {
+    console.error("Lỗi xóa nhiều CV:", error);
+    return { success: false, error: "Không thể xóa các CV đã chọn." };
+  }
+}
+
 export async function getResumes() {
   // Sửa ở đây: Dùng checkUser()
   const user = await checkUser();
