@@ -29,11 +29,14 @@ export const saveResumeAnalysis = async (
   jobDescription,
   resumeId,
   jobDetails = {},
-  inlineFeedback // Thêm tham số mới
+  inlineFeedback
 ) => {
   const user = await checkUser();
   if (!user) throw new Error("Unauthorized");
   if (!resumeId) throw new Error("Resume ID is required");
+
+  // Gọi hàm định dạng JD bằng AI
+  const formattedJD = await formatJDWithAI(jobDescription);
 
   try {
     const savedAnalysis = await db.resumeAnalysis.create({
@@ -41,14 +44,12 @@ export const saveResumeAnalysis = async (
         userId: user.id,
         resumeId: resumeId,
         jobDescription,
+        formattedJobDescription: formattedJD, // <-- Lưu JD đã định dạng
         matchScore: analysisData.matchScore,
         missingKeywords: analysisData.missingKeywords,
         summary: analysisData.summary,
         suggestions: analysisData.suggestions,
-
-        // Lưu cả inlineFeedback vào DB
         inlineFeedback: inlineFeedback || {},
-
         jobTitle: jobDetails?.title,
         companyName: jobDetails?.companyName,
         jobSource: jobDetails?.source,
@@ -85,6 +86,33 @@ export const deleteResumeAnalysis = async (analysisId) => {
     return { error: "Không thể xóa kết quả phân tích." };
   }
 };
+
+async function formatJDWithAI(plainTextJD) {
+  if (!plainTextJD) return null;
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const prompt = `
+    You are an expert web developer. Your task is to convert a plain text job description into a clean, semantic, and readable HTML snippet.
+
+    RULES:
+    1.  Use simple HTML tags: <h2> for main sections (like 'Responsibilities', 'Requirements', 'Benefits'), <ul> and <li> for bullet points, <p> for paragraphs, and <strong> for emphasis.
+    2.  DO NOT include <html>, <head>, or <body> tags.
+    3.  DO NOT include any <style> tags or inline "style" attributes.
+    4.  Your entire output MUST be ONLY the raw HTML string snippet. Do not wrap it in markdown backticks or add any explanations.
+
+    Plain Text Job Description:
+    ---
+    ${plainTextJD}
+    ---
+  `;
+  try {
+    const result = await model.generateContent(prompt);
+    return result.response.text().trim();
+  } catch (error) {
+    console.error("Lỗi định dạng JD bằng AI:", error);
+    // Nếu lỗi, trả về JD gốc trong thẻ <pre> để giữ nguyên định dạng
+    return `<pre>${plainTextJD}</pre>`;
+  }
+}
 
 export const analyzeResumeWithJD = async (jobDescription, resumeId) => {
   const user = await checkUser();

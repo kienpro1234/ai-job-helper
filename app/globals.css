@@ -69,6 +69,22 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  .jd-content h2 {
+    @apply text-lg font-semibold mt-4 mb-2 border-b pb-2;
+  }
+  .jd-content p {
+    @apply mb-3 text-sm leading-relaxed;
+  }
+  .jd-content ul {
+    @apply list-disc pl-5 space-y-1 text-sm;
+  }
+  .jd-content strong {
+    @apply font-semibold text-foreground;
+  }
+  .jd-content pre {
+    @apply whitespace-pre-wrap text-sm font-mono bg-muted p-4 rounded-md;
+  }
 }
 
 @layer utilities {

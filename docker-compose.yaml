@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:17 # Bạn nên chọn phiên bản postgres cụ thể thay vì "latest"
+    container_name: my_postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: khoahoc_web_docker_1 # Đặt user cho database mới trong Docker
+      POSTGRES_PASSWORD: khoa_web_mk_1 # Đặt mật khẩu
+      POSTGRES_DB: khoahoc_web_docker_default # Đặt tên database
+    ports:
+      - "5433:5432" # Map cổng 5432 của container ra cổng 5433 trên máy bạn
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

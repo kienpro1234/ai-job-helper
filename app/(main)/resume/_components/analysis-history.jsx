@@ -18,6 +18,14 @@ import {
 } from "@/components/ui/accordion";
 
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -31,7 +39,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { ExternalLink, Trash2, MessageSquareQuote } from "lucide-react";
+import { ExternalLink, Trash2, MessageSquareQuote, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { InlineFeedbackDialog } from "./inline-feedback-dialog";
 
@@ -39,6 +47,7 @@ export const AnalysisHistory = ({ resumeId }) => {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
+  const [viewingJD, setViewingJD] = useState(null);
 
   useEffect(() => {
     if (resumeId) {
@@ -138,6 +147,14 @@ export const AnalysisHistory = ({ resumeId }) => {
                     </ul>
                   </div>
                   <CardFooter className="p-0 pt-4 flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setViewingJD(item)}
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      Xem JD
+                    </Button>
                     {item.sourceType === "JSearch" && item.jobUrl && (
                       <Button variant="outline" size="sm" asChild>
                         <a
@@ -206,6 +223,31 @@ export const AnalysisHistory = ({ resumeId }) => {
           }
         }}
       />
+
+      {/* DIALOG MỚI ĐỂ XEM JD */}
+      <Dialog
+        open={!!viewingJD}
+        onOpenChange={(isOpen) => !isOpen && setViewingJD(null)}
+      >
+        <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Mô tả Công việc</DialogTitle>
+            <DialogDescription>
+              Đây là JD đã được sử dụng để phân tích cho vị trí "
+              {viewingJD?.jobTitle || "N/A"}".
+            </DialogDescription>
+          </DialogHeader>
+          <div className="overflow-y-auto pr-6 -mr-6 jd-content">
+            <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  viewingJD?.formattedJobDescription ||
+                  `<pre>${viewingJD?.jobDescription}</pre>`,
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

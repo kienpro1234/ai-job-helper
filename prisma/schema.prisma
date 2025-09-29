@@ -73,6 +73,8 @@ model ResumeAnalysis {
   resume          Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
 
   jobDescription  String   @db.Text
+
+  formattedJobDescription String? @db.Text // Lưu JD đã được định dạng HTML
   matchScore      Int
   missingKeywords String[]
   summary         String   @db.Text
