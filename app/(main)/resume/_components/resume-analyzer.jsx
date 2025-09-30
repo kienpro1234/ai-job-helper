@@ -61,6 +61,7 @@ const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
         },
       });
       setIsDialogOpen(false);
+      router.refresh();
     }
   };
 

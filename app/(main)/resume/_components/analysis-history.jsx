@@ -1,7 +1,9 @@
+// File: kienpro1234/ai-job-helper/ai-job-helper-70c88787fe3da399b39e38aedab1e16a8bc5d1f4/app/(main)/resume/_components/analysis-history.jsx
+
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAnalysisHistory, deleteResumeAnalysis } from "@/actions/analysis";
+import { deleteResumeAnalysis } from "@/actions/analysis";
 import {
   Card,
   CardContent,
@@ -16,7 +18,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,32 +43,19 @@ import { ExternalLink, Trash2, MessageSquareQuote, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { InlineFeedbackDialog } from "./inline-feedback-dialog";
 
-export const AnalysisHistory = ({ resumeId }) => {
-  const [history, setHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const AnalysisHistory = ({ resumeId, initialHistory }) => {
+  const [history, setHistory] = useState(initialHistory);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [viewingJD, setViewingJD] = useState(null);
 
+  // Cập nhật state nếu prop từ server thay đổi (sau khi router.refresh được gọi)
   useEffect(() => {
-    if (resumeId) {
-      const fetchHistory = async () => {
-        setIsLoading(true);
-        const result = await getAnalysisHistory(resumeId);
-        if (result.success) {
-          setHistory(result.data);
-        }
-        setIsLoading(false);
-      };
-      fetchHistory();
-    } else {
-      setIsLoading(false);
-    }
-  }, [resumeId]);
+    setHistory(initialHistory);
+  }, [initialHistory]);
 
   const handleDelete = async (analysisId) => {
     const result = await deleteResumeAnalysis(analysisId);
     if (result.success) {
-      // Cập nhật lại state để UI thay đổi ngay lập tức
       setHistory((currentHistory) =>
         currentHistory.filter((item) => item.id !== analysisId)
       );
@@ -78,12 +65,17 @@ export const AnalysisHistory = ({ resumeId }) => {
     }
   };
 
-  if (isLoading) {
-    return <div>Đang tải lịch sử phân tích...</div>;
-  }
-
-  if (history.length === 0) {
-    return null; // Không hiển thị gì nếu chưa có lịch sử
+  if (!history || history.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Lịch sử Phân tích CV</CardTitle>
+          <CardDescription>
+            Chưa có lịch sử phân tích nào cho CV này.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
   }
 
   return (
@@ -101,7 +93,6 @@ export const AnalysisHistory = ({ resumeId }) => {
               <AccordionItem value={item.id} key={item.id}>
                 <AccordionTrigger>
                   <div className="flex flex-col md:flex-row justify-between w-full pr-4 text-left">
-                    {/* === HIỂN THỊ TIÊU ĐỀ JOB VÀ CÔNG TY === */}
                     <div className="flex-1 truncate">
                       <p
                         className="font-semibold truncate"
@@ -167,7 +158,6 @@ export const AnalysisHistory = ({ resumeId }) => {
                         </a>
                       </Button>
                     )}
-                    {/* THAY ĐỔI Ở ĐÂY: Chỉ hiển thị nút nếu có inlineFeedback */}
                     {item.inlineFeedback &&
                       Object.keys(item.inlineFeedback).length > 0 && (
                         <Button
@@ -179,7 +169,6 @@ export const AnalysisHistory = ({ resumeId }) => {
                           Xem nhận xét trực quan
                         </Button>
                       )}
-                    {/* Nút xóa và hộp thoại xác nhận */}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="destructive" size="sm">
@@ -223,8 +212,6 @@ export const AnalysisHistory = ({ resumeId }) => {
           }
         }}
       />
-
-      {/* DIALOG MỚI ĐỂ XEM JD */}
       <Dialog
         open={!!viewingJD}
         onOpenChange={(isOpen) => !isOpen && setViewingJD(null)}

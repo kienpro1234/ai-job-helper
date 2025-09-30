@@ -3,6 +3,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { checkUser } from "@/lib/checkUser";
 import { db } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -57,6 +58,7 @@ export const saveResumeAnalysis = async (
         sourceType: jobDetails?.sourceType,
       },
     });
+    revalidatePath(`/resume/${resumeId}`);
     return { success: true, data: savedAnalysis };
   } catch (error) {
     console.error("Lỗi khi lưu kết quả phân tích:", error);
