@@ -1,0 +1,95 @@
+/* app/(main)/ai-cover-letter/_components/cover-letter-styles.css */
+
+.letter-container {
+  @apply bg-gray-100 dark:bg-gray-900 p-4 sm:p-8 rounded-lg;
+}
+
+.letter-paper {
+  @apply bg-white p-8 sm:p-12 md:p-16 shadow-lg max-w-4xl mx-auto text-gray-800;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.letter-header {
+  @apply text-center border-b-2 border-gray-300 pb-4 mb-8;
+}
+
+.letter-name {
+  @apply text-3xl font-bold tracking-wider uppercase;
+  color: #5d6d7e;
+}
+
+.letter-contact-info {
+  @apply flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600 mt-2;
+}
+
+.letter-contact-info span {
+  @apply flex items-center gap-2;
+}
+
+.letter-meta {
+  @apply mb-8 text-sm leading-relaxed;
+}
+
+.letter-date {
+  @apply mb-4;
+}
+
+.letter-body p {
+  @apply mb-4 leading-relaxed text-base;
+}
+
+.letter-signature {
+  @apply mt-8 font-serif italic text-xl;
+  font-family: "Brush Script MT", "Brush Script Std", cursive;
+}
+
+.pdf-render-offscreen {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 210mm; /* A4 width */
+  background: white;
+}
+
+/* --- CSS TỐI ƯU HÓA CHO PDF (QUAN TRỌNG) --- */
+@media print {
+  body {
+    background-color: #fff !important;
+  }
+
+  .letter-paper {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    /* Giảm cỡ chữ và khoảng cách dòng hơn nữa */
+    font-size: 11pt;
+    line-height: 1.35;
+  }
+
+  .letter-name {
+    font-size: 24pt;
+    margin-bottom: 2px;
+  }
+
+  .letter-contact-info {
+    margin-top: 4px;
+    gap: 1rem; /* Giảm khoảng cách giữa các mục contact */
+  }
+
+  .letter-header {
+    margin-bottom: 2rem; /* Giảm khoảng cách dưới header */
+  }
+
+  .letter-meta {
+    margin-bottom: 2rem; /* Giảm khoảng cách dưới meta */
+  }
+
+  .letter-body p {
+    margin-bottom: 10px; /* Giảm khoảng cách giữa các đoạn văn */
+  }
+
+  .letter-signature {
+    font-size: 18pt;
+    margin-top: 2rem;
+  }
+}

@@ -21,18 +21,38 @@ import useFetch from "@/hooks/use-fetch";
 import { coverLetterSchema } from "@/app/lib/schema";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 export default function CoverLetterGenerator() {
   const router = useRouter();
+  const { user } = useUser();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm({
     resolver: zodResolver(coverLetterSchema),
+    defaultValues: {
+      yourName: "",
+      yourAddress: "",
+      yourPhone: "",
+      yourEmail: "",
+      jobTitle: "",
+      companyName: "",
+      jobDescription: "",
+    },
   });
+
+  // Tự động điền thông tin người dùng khi component được mount
+  useEffect(() => {
+    if (user) {
+      setValue("yourName", user.fullName || "");
+      setValue("yourEmail", user.primaryEmailAddress?.emailAddress || "");
+    }
+  }, [user, setValue]);
 
   const {
     loading: generating,
@@ -45,9 +65,10 @@ export default function CoverLetterGenerator() {
     if (generatedLetter) {
       toast.success("Cover letter generated successfully!");
       router.push(`/ai-cover-letter/${generatedLetter.id}`);
+      router.refresh();
       reset();
     }
-  }, [generatedLetter]);
+  }, [generatedLetter, router, reset]);
 
   const onSubmit = async (data) => {
     try {
@@ -67,51 +88,112 @@ export default function CoverLetterGenerator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Form fields remain the same */}
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* User Details Section */}
+            <div className="space-y-4 p-4 border rounded-lg">
+              <h3 className="font-medium text-lg">Your Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="yourName">Full Name</Label>
+                  <Input
+                    id="yourName"
+                    placeholder="Your full name"
+                    {...register("yourName")}
+                  />
+                  {errors.yourName && (
+                    <p className="text-sm text-red-500">
+                      {errors.yourName.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="yourPhone">Phone Number</Label>
+                  <Input
+                    id="yourPhone"
+                    placeholder="(123) 456-7890"
+                    {...register("yourPhone")}
+                  />
+                  {errors.yourPhone && (
+                    <p className="text-sm text-red-500">
+                      {errors.yourPhone.message}
+                    </p>
+                  )}
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="companyName">Company Name</Label>
+                <Label htmlFor="yourAddress">Address</Label>
                 <Input
-                  id="companyName"
-                  placeholder="Enter company name"
-                  {...register("companyName")}
+                  id="yourAddress"
+                  placeholder="City, State, Zip Code"
+                  {...register("yourAddress")}
                 />
-                {errors.companyName && (
+                {errors.yourAddress && (
                   <p className="text-sm text-red-500">
-                    {errors.companyName.message}
+                    {errors.yourAddress.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="jobTitle">Job Title</Label>
+                <Label htmlFor="yourEmail">Email Address</Label>
                 <Input
-                  id="jobTitle"
-                  placeholder="Enter job title"
-                  {...register("jobTitle")}
+                  id="yourEmail"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  {...register("yourEmail")}
                 />
-                {errors.jobTitle && (
+                {errors.yourEmail && (
                   <p className="text-sm text-red-500">
-                    {errors.jobTitle.message}
+                    {errors.yourEmail.message}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="jobDescription">Job Description</Label>
-              <Textarea
-                id="jobDescription"
-                placeholder="Paste the job description here"
-                className="h-32"
-                {...register("jobDescription")}
-              />
-              {errors.jobDescription && (
-                <p className="text-sm text-red-500">
-                  {errors.jobDescription.message}
-                </p>
-              )}
+            {/* Job Details Section */}
+            <div className="space-y-4 p-4 border rounded-lg">
+              <h3 className="font-medium text-lg">Job Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input
+                    id="companyName"
+                    placeholder="Enter company name"
+                    {...register("companyName")}
+                  />
+                  {errors.companyName && (
+                    <p className="text-sm text-red-500">
+                      {errors.companyName.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="jobTitle">Job Title</Label>
+                  <Input
+                    id="jobTitle"
+                    placeholder="Enter job title"
+                    {...register("jobTitle")}
+                  />
+                  {errors.jobTitle && (
+                    <p className="text-sm text-red-500">
+                      {errors.jobTitle.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="jobDescription">Job Description</Label>
+                <Textarea
+                  id="jobDescription"
+                  placeholder="Paste the job description here"
+                  className="h-32"
+                  {...register("jobDescription")}
+                />
+                {errors.jobDescription && (
+                  <p className="text-sm text-red-500">
+                    {errors.jobDescription.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="flex justify-end">

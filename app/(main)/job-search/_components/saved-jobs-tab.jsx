@@ -40,6 +40,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ResumeSelectionModal } from "./ResumeSelectionModal";
+import { CoverLetterCreationModal } from "./CoverLetterCreationModal";
 
 export default function SavedJobsTab({ initialSavedJobs }) {
   const router = useRouter();
@@ -51,6 +52,9 @@ export default function SavedJobsTab({ initialSavedJobs }) {
 
   const [isBulkDeleteMode, setIsBulkDeleteMode] = useState(false);
   const [selectedJobs, setSelectedJobs] = useState(new Set());
+
+  // <<< THÊM STATE CHO MODAL >>>
+  const [jobForLetter, setJobForLetter] = useState(null);
 
   useEffect(() => {
     setSavedJobs(initialSavedJobs);
@@ -88,37 +92,8 @@ export default function SavedJobsTab({ initialSavedJobs }) {
   };
 
   // === PHẦN SỬA LỖI: KHÔI PHỤC LẠI LOGIC CHO HÀM NÀY ===
-  const handleGenerateCoverLetter = async (job) => {
-    setGeneratingLetterId(job.id);
-    const toastId = toast.loading(
-      `Đang tạo cover letter cho vị trí ${job.title}...`
-    );
-
-    try {
-      const newCoverLetter = await generateCoverLetter({
-        jobTitle: job.title,
-        companyName: job.companyName,
-        jobDescription: job.description,
-        url: job.url,
-        source: job.source,
-        sourceType: job.sourceType,
-      });
-
-      toast.success("Tạo cover letter thành công!", {
-        id: toastId,
-        action: {
-          label: "Xem ngay",
-          onClick: () => router.push(`/ai-cover-letter/${newCoverLetter.id}`),
-        },
-      });
-      router.refresh();
-    } catch (error) {
-      toast.error(error.message || "Tạo cover letter thất bại.", {
-        id: toastId,
-      });
-    } finally {
-      setGeneratingLetterId(null);
-    }
+  const handleGenerateCoverLetter = (job) => {
+    setJobForLetter(job); // Mở modal bằng cách set job
   };
   // =======================================================
 
@@ -280,7 +255,7 @@ export default function SavedJobsTab({ initialSavedJobs }) {
                     {generatingLetterId === job.id ? (
                       <Loader2 className="animate-spin" />
                     ) : (
-                      <PenBox />
+                      <PenBox className="h-4 w-4" />
                     )}
                     Tạo Cover Letter
                   </Button>
@@ -319,6 +294,13 @@ export default function SavedJobsTab({ initialSavedJobs }) {
         })}
       </div>
 
+      {jobForLetter && (
+        <CoverLetterCreationModal
+          job={jobForLetter}
+          open={!!jobForLetter}
+          onOpenChange={() => setJobForLetter(null)}
+        />
+      )}
       {selectedJob && (
         <ResumeSelectionModal
           job={selectedJob}

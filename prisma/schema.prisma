@@ -31,6 +31,10 @@ model User {
   resume        Resume[]
   coverLetter   CoverLetter[]
   savedJobs     SavedJob[]
+
+
+  phone         String?   
+  address       String?   
 }
 
 model Assessment {
