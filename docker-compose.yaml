@@ -1,18 +1,35 @@
 version: "3.8"
 
 services:
+  # CONTAINER CŨ (TỪ LOCAL) - Giữ nguyên không thay đổi
   db:
-    image: postgres:17 # Bạn nên chọn phiên bản postgres cụ thể thay vì "latest"
-    container_name: my_postgres_db
+    image: postgres:17
+    container_name: khoahoc_web_container # Đổi tên để dễ quản lý
     restart: unless-stopped
     environment:
-      POSTGRES_USER: khoahoc_web_docker_1 # Đặt user cho database mới trong Docker
-      POSTGRES_PASSWORD: khoa_web_mk_1 # Đặt mật khẩu
-      POSTGRES_DB: khoahoc_web_docker_default # Đặt tên database
+      POSTGRES_USER: khoahoc_web_docker_1
+      POSTGRES_PASSWORD: khoa_web_mk_1
+      POSTGRES_DB: khoahoc_web_docker_default
     ports:
-      - "5433:5432" # Map cổng 5432 của container ra cổng 5433 trên máy bạn
+      - "5433:5432" # Giữ nguyên cổng 5433
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # CONTAINER MỚI (CHO DỮ LIỆU TỪ NEON) - Đây là phần bạn thêm vào
+  db_neon:
+    image: postgres:17 # Bạn có thể dùng bản 17 như mong muốn
+    container_name: ${NEON_CONTAINER_NAME} # Tên container mới, phải khác tên cũ
+    restart: unless-stopped
+    environment:
+      # Bạn nên tạo user/pass/db mới cho container này để dễ quản lý
+      POSTGRES_USER: ${NEON_USER}
+      POSTGRES_PASSWORD: ${NEON_PASSWORD}
+      POSTGRES_DB: ${NEON_DB}
+    ports:
+      - "5434:5432" # QUAN TRỌNG: Dùng một cổng khác, ví dụ 5434
+    volumes:
+      - postgres_data_neon:/var/lib/postgresql/data # QUAN TRỌNG: Dùng một volume mới
+
 volumes:
   postgres_data:
+  postgres_data_neon: # Khai báo volume mới ở đây
