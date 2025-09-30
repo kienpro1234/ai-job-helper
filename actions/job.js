@@ -196,3 +196,24 @@ export async function deleteSavedJob(id) {
   revalidatePath("/job-search");
   return { success: true };
 }
+
+export async function deleteMultipleSavedJobs(ids) {
+  const user = await checkUser();
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    const result = await db.savedJob.deleteMany({
+      where: {
+        id: { in: ids },
+        userId: user.id,
+      },
+    });
+    revalidatePath("/job-search");
+    return { success: true, count: result.count };
+  } catch (error) {
+    console.error("Error deleting multiple saved jobs:", error);
+    return { error: "Không thể xóa các công việc đã chọn." };
+  }
+}

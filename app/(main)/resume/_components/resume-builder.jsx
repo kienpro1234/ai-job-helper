@@ -11,7 +11,8 @@ import {
   Loader2,
   Monitor,
   Save,
-  Sparkles, // Import Sparkles icon
+  Sparkles,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import MDEditor from "@uiw/react-md-editor";
@@ -258,6 +259,16 @@ export default function ResumeBuilder({
             {resumeId ? "Chỉnh sửa CV" : "Resume Builder"}
           </h1>
           <div className="space-x-2">
+            {resumeId && (
+              <Button
+                variant="outline"
+                type="button" // Quan trọng: để không submit form
+                onClick={() => router.push(`/resume/${resumeId}`)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Hủy
+              </Button>
+            )}
             <Button
               variant="default"
               disabled={isSaving || isUpdating}

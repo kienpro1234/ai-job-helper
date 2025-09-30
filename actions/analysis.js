@@ -89,6 +89,33 @@ export const deleteResumeAnalysis = async (analysisId) => {
   }
 };
 
+export async function deleteMultipleResumeAnalyses(ids) {
+  const user = await checkUser();
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+  if (!ids || ids.length === 0) {
+    return { error: "No analysis IDs provided." };
+  }
+
+  try {
+    const result = await db.resumeAnalysis.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        userId: user.id, // Đảm bảo người dùng chỉ xóa phân tích của họ
+      },
+    });
+
+    // Client sẽ gọi router.refresh(), nên không cần revalidatePath ở đây
+    return { success: true, count: result.count };
+  } catch (error) {
+    console.error("Error deleting multiple analyses:", error);
+    return { error: "Không thể xóa các mục phân tích đã chọn." };
+  }
+}
+
 async function formatJDWithAI(plainTextJD) {
   if (!plainTextJD) return null;
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
