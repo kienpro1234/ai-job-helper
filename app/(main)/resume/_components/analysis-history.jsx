@@ -334,7 +334,7 @@ export const AnalysisHistory = ({ resumeId, initialHistory }) => {
                             onClick={() => setSelectedAnalysis(item)}
                           >
                             <MessageSquareQuote className="mr-2 h-4 w-4" />
-                            Xem nhận xét
+                            Xem trực quan nhận xét
                           </Button>
                         )}
                     </div>

@@ -52,7 +52,6 @@ export default function SavedJobsTab({ initialSavedJobs }) {
   const [isBulkDeleteMode, setIsBulkDeleteMode] = useState(false);
   const [selectedJobs, setSelectedJobs] = useState(new Set());
 
-  // Đồng bộ state với prop từ server khi có thay đổi (sau khi refresh)
   useEffect(() => {
     setSavedJobs(initialSavedJobs);
   }, [initialSavedJobs]);
@@ -62,7 +61,7 @@ export default function SavedJobsTab({ initialSavedJobs }) {
       const result = await deleteSavedJob(id);
       if (result.success) {
         toast.success("Job removed successfully!");
-        router.refresh(); // Tải lại dữ liệu từ server
+        router.refresh();
       } else {
         toast.error("Failed to remove job.");
       }
@@ -88,9 +87,40 @@ export default function SavedJobsTab({ initialSavedJobs }) {
     });
   };
 
+  // === PHẦN SỬA LỖI: KHÔI PHỤC LẠI LOGIC CHO HÀM NÀY ===
   const handleGenerateCoverLetter = async (job) => {
-    // ... logic này giữ nguyên
+    setGeneratingLetterId(job.id);
+    const toastId = toast.loading(
+      `Đang tạo cover letter cho vị trí ${job.title}...`
+    );
+
+    try {
+      const newCoverLetter = await generateCoverLetter({
+        jobTitle: job.title,
+        companyName: job.companyName,
+        jobDescription: job.description,
+        url: job.url,
+        source: job.source,
+        sourceType: job.sourceType,
+      });
+
+      toast.success("Tạo cover letter thành công!", {
+        id: toastId,
+        action: {
+          label: "Xem ngay",
+          onClick: () => router.push(`/ai-cover-letter/${newCoverLetter.id}`),
+        },
+      });
+      router.refresh();
+    } catch (error) {
+      toast.error(error.message || "Tạo cover letter thất bại.", {
+        id: toastId,
+      });
+    } finally {
+      setGeneratingLetterId(null);
+    }
   };
+  // =======================================================
 
   const toggleBulkDeleteMode = () => {
     setIsBulkDeleteMode((prev) => !prev);
