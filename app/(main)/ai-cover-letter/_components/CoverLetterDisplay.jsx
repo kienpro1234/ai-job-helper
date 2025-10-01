@@ -1,11 +1,7 @@
 // app/(main)/ai-cover-letter/_components/CoverLetterDisplay.jsx
-"use client";
 
-import React from "react";
-// import { Mail, Phone, MapPin } from "lucide-react";
-import "./cover-letter-styles.css";
+// ... (các import và phần đầu component giữ nguyên)
 
-// Hàm để phân tích nội dung Markdown
 const parseCoverLetter = (markdown) => {
   if (!markdown) return {};
 
@@ -24,6 +20,7 @@ const parseCoverLetter = (markdown) => {
   let state = "header";
 
   for (const line of lines) {
+    // ... (vòng lặp for giữ nguyên)
     if (line.startsWith("**Subject:")) {
       state = "body";
       result.body.push(line);
@@ -71,37 +68,52 @@ const parseCoverLetter = (markdown) => {
     }
   }
 
-  // Lấy thông tin chi tiết từ header
+  // --- BẮT ĐẦU PHẦN SỬA LỖI LOGIC TÁCH CHUỖI ---
   result.name = result.header[0] || "[Your Name]";
-  const contactLine = result.header.slice(1).join(" | ");
 
-  const emailMatch = contactLine.match(/[\w.-]+@[\w.-]+\.\w+/);
-  const phoneMatch = contactLine.match(/\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+  const remainingHeaderLines = result.header.slice(1);
+  let phone = "[Your Phone]";
+  let email = "[Your Email]";
+  const addressParts = [];
 
-  result.email = emailMatch ? emailMatch[0] : "[Your Email]";
-  result.phone = phoneMatch ? phoneMatch[0] : "[Your Phone]";
-  // Giả định phần còn lại là địa chỉ
-  result.address = contactLine
-    .replace(result.email, "")
-    .replace(result.phone, "")
-    .replace(/\|/g, "")
-    .trim();
+  const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
+  // Regex linh hoạt hơn cho số điện thoại Việt Nam
+  const phoneRegex = /(?:\(?\d{3,4}\)?[-.\s]?)?\d{3}[-.\s]?\d{3,4}/;
+
+  remainingHeaderLines.forEach((line) => {
+    if (emailRegex.test(line)) {
+      email = line.replace(/\|/g, "").trim();
+    } else if (phoneRegex.test(line)) {
+      phone = line.replace(/\|/g, "").trim();
+    } else {
+      // Nếu không phải email hay phone, coi nó là một phần của địa chỉ
+      addressParts.push(line.replace(/\|/g, "").trim());
+    }
+  });
+
+  result.phone = phone;
+  result.email = email;
+  result.address = addressParts.join(", ").trim(); // Nối các phần địa chỉ lại với nhau
+  // --- KẾT THÚC PHẦN SỬA LỖI ---
 
   return result;
 };
 
+// ... (phần còn lại của component CoverLetterDisplay giữ nguyên)
 const CoverLetterDisplay = ({ content }) => {
   const data = parseCoverLetter(content);
 
   return (
     <div className="letter-container">
-      <div className="letter-paper">
+      <div className="letter-paper" id="pdf-content">
         {/* Header */}
         <div className="letter-header">
           <h1 className="letter-name">{data.name}</h1>
           <div className="letter-contact-info">
             <span>📞 {data.phone}</span>
+            <span className="separator">|</span>
             <span>📧 {data.email}</span>
+            <span className="separator">|</span>
             <span>📍 {data.address}</span>
           </div>
         </div>
