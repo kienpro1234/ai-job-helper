@@ -19,7 +19,6 @@ export const getAnalysisHistory = async (resumeId) => {
     orderBy: {
       createdAt: "desc",
     },
-    // Không cần include resume ở đây nữa
   });
   return { success: true, data: history };
 };
@@ -43,7 +42,7 @@ export const saveResumeAnalysis = async (
         userId: user.id,
         resumeId: resumeId,
         jobDescription,
-        formattedJobDescription: formattedJD, // <-- Lưu JD đã định dạng
+        formattedJobDescription: formattedJD,
         matchScore: analysisData.matchScore,
         missingKeywords: analysisData.missingKeywords,
         summary: analysisData.summary,
