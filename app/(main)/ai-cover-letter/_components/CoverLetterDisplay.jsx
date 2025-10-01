@@ -2,13 +2,17 @@
 "use client";
 
 import React from "react";
+// import { Mail, Phone, MapPin } from "lucide-react";
 import "./cover-letter-styles.css";
 
-// Hàm phân tích này giữ nguyên như lần cập nhật trước
-const parseCoverLetterBody = (markdown) => {
+// Hàm để phân tích nội dung Markdown
+const parseCoverLetter = (markdown) => {
   if (!markdown) return {};
-  const lines = markdown.split("\n");
+
+  const lines = markdown.split("\n").map((line) => line.trim());
+
   const result = {
+    header: [],
     date: "",
     recipient: [],
     salutation: "",
@@ -16,16 +20,18 @@ const parseCoverLetterBody = (markdown) => {
     closing: "",
     signature: "",
   };
-  let state = "start";
+
+  let state = "header";
+
   for (const line of lines) {
-    if (state === "start" && (line.startsWith("Dear") || line.match(/^\w+,/))) {
-      state = "salutation";
-    } else if (state === "start" && line.match(/\w+\s\d{1,2},\s\d{4}/)) {
-      state = "date";
+    if (line.startsWith("**Subject:")) {
+      state = "body";
+      result.body.push(line);
+      continue;
     }
     if (line.toLowerCase().startsWith("dear")) {
-      result.salutation = line;
       state = "body";
+      result.salutation = line;
       continue;
     }
     if (
@@ -36,72 +42,71 @@ const parseCoverLetterBody = (markdown) => {
       result.closing = line;
       continue;
     }
-    if (state === "closing" && line.trim()) {
+    if (state === "closing" && line) {
       state = "signature";
     }
+
     switch (state) {
+      case "header":
+        if (line) result.header.push(line);
+        else state = "date";
+        break;
       case "date":
         if (line) {
-          result.date = line.trim();
+          result.date = line;
           state = "recipient";
         }
         break;
       case "recipient":
-        if (line.trim()) result.recipient.push(line.trim());
+        if (line) result.recipient.push(line);
         else state = "salutation";
         break;
       case "body":
         result.body.push(line);
         break;
       case "signature":
-        if (line.trim()) result.signature = line.trim();
-        state = "done";
-        break;
-      default:
+        result.signature = line;
+        state = "done"; // Stop parsing
         break;
     }
   }
+
+  // Lấy thông tin chi tiết từ header
+  result.name = result.header[0] || "[Your Name]";
+  const contactLine = result.header.slice(1).join(" | ");
+
+  const emailMatch = contactLine.match(/[\w.-]+@[\w.-]+\.\w+/);
+  const phoneMatch = contactLine.match(/\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+
+  result.email = emailMatch ? emailMatch[0] : "[Your Email]";
+  result.phone = phoneMatch ? phoneMatch[0] : "[Your Phone]";
+  // Giả định phần còn lại là địa chỉ
+  result.address = contactLine
+    .replace(result.email, "")
+    .replace(result.phone, "")
+    .replace(/\|/g, "")
+    .trim();
+
   return result;
 };
 
-const CoverLetterDisplay = ({ content, coverLetter }) => {
-  const data = parseCoverLetterBody(content);
-  const user = coverLetter?.user;
-
-  // Tạo một mảng chứa các phần thông tin liên hệ để dễ dàng nối với nhau
-  const contactParts = [
-    // Tên sẽ là một phần tử riêng
-    user?.name,
-    // Các thông tin khác, có icon đi kèm nếu tồn tại
-    user?.phone && `📞 ${user.phone}`,
-    user?.email && `📧 ${user.email}`,
-    user?.address && `📍 ${user.address}`,
-  ].filter(Boolean); // Lọc ra những giá trị null hoặc rỗng
+const CoverLetterDisplay = ({ content }) => {
+  const data = parseCoverLetter(content);
 
   return (
     <div className="letter-container">
       <div className="letter-paper">
-        {/* === PHẦN HEADER ĐÃ SỬA LẠI THEO Ý BẠN === */}
+        {/* Header */}
         <div className="letter-header">
-          <h1 className="letter-job-title">
-            {coverLetter?.jobTitle || "Cover Letter"}
-          </h1>
+          <h1 className="letter-name">{data.name}</h1>
           <div className="letter-contact-info">
-            {contactParts.map((part, index) => (
-              <React.Fragment key={index}>
-                <span className="contact-part">{part}</span>
-                {/* Thêm dấu ngăn cách nếu không phải là phần tử cuối cùng */}
-                {index < contactParts.length - 1 && (
-                  <span className="separator" aria-hidden="true">
-                    &nbsp;|&nbsp;
-                  </span>
-                )}
-              </React.Fragment>
-            ))}
+            <span>📞 {data.phone}</span>
+            <span>📧 {data.email}</span>
+            <span>📍 {data.address}</span>
           </div>
         </div>
 
-        {/* Phần còn lại của thư giữ nguyên */}
+        {/* Date and Recipient */}
         <div className="letter-meta">
           <p className="letter-date">{data.date}</p>
           <div className="letter-recipient">
@@ -110,9 +115,12 @@ const CoverLetterDisplay = ({ content, coverLetter }) => {
             ))}
           </div>
         </div>
+
+        {/* Body */}
         <div className="letter-body">
           <p className="font-semibold">{data.salutation}</p>
           {data.body.map((paragraph, i) => (
+            // Xử lý markdown đơn giản cho đậm và nghiêng
             <p
               key={i}
               dangerouslySetInnerHTML={{
@@ -123,7 +131,7 @@ const CoverLetterDisplay = ({ content, coverLetter }) => {
             />
           ))}
           <p>{data.closing}</p>
-          <p className="letter-signature">{data.signature || user?.name}</p>
+          <p className="letter-signature">{data.signature}</p>
         </div>
       </div>
     </div>

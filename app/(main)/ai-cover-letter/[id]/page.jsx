@@ -354,16 +354,10 @@ export default function EditCoverLetterPage({ params }) {
         </div>
       ) : (
         <>
-          <CoverLetterDisplay
-            content={coverLetter?.content}
-            coverLetter={coverLetter}
-          />
+          <CoverLetterDisplay content={coverLetter?.content} />
           <div className="pdf-render-offscreen">
             <div id="pdf-content" ref={exportRef}>
-              <CoverLetterDisplay
-                content={coverLetter?.content}
-                coverLetter={coverLetter}
-              />
+              <CoverLetterDisplay content={coverLetter?.content} />
             </div>
           </div>
         </>

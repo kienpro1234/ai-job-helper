@@ -121,10 +121,6 @@ export async function getCoverLetter(id) {
       id,
       userId: user.id,
     },
-    // Thêm dòng include này để lấy cả thông tin user
-    include: {
-      user: true,
-    },
   });
 }
 
