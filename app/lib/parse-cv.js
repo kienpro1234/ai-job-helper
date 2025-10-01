@@ -1,5 +1,3 @@
-// app/lib/parse-cv.js
-
 /**
  * Phân tích chuỗi HTML của phần contact info để lấy chi tiết.
  * @param {string} htmlString - Chuỗi HTML chứa thông tin liên hệ.
@@ -106,12 +104,11 @@ export function parseCvMarkdown(markdown) {
       .replace(/<hr>\s*$/, "")
       .trim();
 
-    // ĐÃ THÊM: Gọi hàm parseContactInfo
     result.contactInfo = parseContactInfo(contactAndNameSection);
 
     remainingMarkdown = markdown.substring(index);
   } else {
-    // ĐÃ THÊM: Xử lý trường hợp CV chỉ có phần header
+    // Xử lý trường hợp CV chỉ có phần header
     result.contactInfo = parseContactInfo(markdown.trim());
     return result;
   }

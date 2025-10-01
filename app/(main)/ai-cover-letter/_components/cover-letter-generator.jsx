@@ -46,7 +46,6 @@ export default function CoverLetterGenerator() {
     },
   });
 
-  // Tự động điền thông tin người dùng khi component được mount
   useEffect(() => {
     if (user) {
       setValue("yourName", user.fullName || "");
@@ -60,7 +59,6 @@ export default function CoverLetterGenerator() {
     data: generatedLetter,
   } = useFetch(generateCoverLetter);
 
-  // Update content when letter is generated
   useEffect(() => {
     if (generatedLetter) {
       toast.success("Cover letter generated successfully!");

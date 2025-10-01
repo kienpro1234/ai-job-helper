@@ -101,7 +101,6 @@ body {
 }
 
 .hero-image {
-  /* transform: rotateX(20deg) scale(0.9) translateY(-50); */
   transform: rotateX(15deg) scale(1);
   transition: transform 0.5s ease-out;
   will-change: transform;
@@ -229,18 +228,14 @@ body {
   }
 
   .cta-launch-button {
-    /* Base styles: size, shape, font */
     @apply relative inline-flex items-center justify-center rounded-full px-12 py-8 text-xl font-bold transition-transform duration-300 overflow-hidden;
 
-    /* --- PHẦN SỬA LỖI QUAN TRỌNG --- */
-    /* Ghi đè màu nền và màu chữ một cách tường minh */
-    background-color: hsl(var(--secondary)); /* Nền màu xám tối để nổi bật */
-    color: hsl(var(--foreground)); /* Chữ màu sáng */
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--foreground));
     border: 1px solid hsl(var(--border));
     min-width: 300px;
   }
 
-  /* Hiệu ứng quét sáng */
   .cta-launch-button::after {
     content: "";
     position: absolute;
@@ -258,14 +253,13 @@ body {
     animation: scan 3s linear infinite;
   }
 
-  /* Đảm bảo text và icon luôn nằm trên cùng */
   .cta-launch-button > * {
     @apply relative z-10;
   }
 
   .cta-launch-button:hover {
     transform: scale(1.05);
-    /* Làm cho viền và hiệu ứng sáng hơn khi hover */
+
     border-color: hsl(var(--primary));
     @apply text-black;
   }
@@ -287,7 +281,6 @@ body {
   }
 }
 
-/* Thêm hiệu ứng cho gradient text */
 @keyframes gradient-animation {
   0% {
     background-position: 0% 50%;

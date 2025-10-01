@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    // THÊM 2 DÒNG DƯỚI ĐÂY VÀO
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     },
 
-    // CÁC CẤU HÌNH CÒN LẠI GIỮ NGUYÊN
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

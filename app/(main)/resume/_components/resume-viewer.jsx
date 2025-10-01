@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteResume } from "@/actions/resume";
 import "../resume-styles.css";
-// Tái sử dụng component analyzer
 
 export const ResumeViewer = ({ resume }) => {
   const router = useRouter();
@@ -61,7 +60,6 @@ export const ResumeViewer = ({ resume }) => {
         </h1>
         <div className="flex gap-2">
           <Button onClick={generatePDF} disabled={isGenerating}>
-            {/* ... */}
             Download PDF
           </Button>
           <Button
@@ -110,7 +108,6 @@ export const ResumeViewer = ({ resume }) => {
       </div>
       {/* Phần ẩn để tạo PDF */}
       <div className="pdf-render-offscreen">
-        {/* Muốn xem pdf có css nữa thì phải css ở đây nữa  */}
         <div id={`resume-pdf-${resume.id}`} className="resume-container">
           <MDEditor.Markdown
             source={resume.content}
@@ -120,7 +117,6 @@ export const ResumeViewer = ({ resume }) => {
         </div>
       </div>
 
-      {/* Component phân tích CV */}
       <ResumeAnalyzer resumeId={resume.id} />
     </div>
   );

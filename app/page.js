@@ -312,7 +312,6 @@ export default function LandingPage() {
                     index % 2 === 1 ? "md:order-last" : ""
                   }`}
                 >
-                  {/* ADDED a new class here for styling */}
                   <div className="feature-icon-container">{feature.icon}</div>
                 </div>
                 {/* Content Section */}
@@ -434,7 +433,6 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12 max-w-7xl mx-auto">
-            {/* Step Selector (Không thay đổi) */}
             <div className="md:col-span-1 flex flex-col space-y-4">
               {userGuide.map((guide) => (
                 <Button
@@ -449,14 +447,12 @@ export default function LandingPage() {
               ))}
             </div>
 
-            {/* Step Content - Đã cập nhật */}
+            {/* Step Content */}
             <div className="md:col-span-2">
               <Card className="p-6 h-full shadow-lg">
                 <CardContent className="p-0 flex flex-col h-full">
-                  {/* Bọc hình ảnh bằng Dialog để có thể click */}
                   <Dialog>
                     <DialogTrigger asChild>
-                      {/* SỬA Ở ĐÂY: Thêm cursor-pointer và thay đổi object-cover thành object-contain */}
                       <div className="aspect-video w-full overflow-hidden rounded-lg mb-6 border bg-black/20 cursor-pointer">
                         <Image
                           src={activeGuide.image}
@@ -467,9 +463,8 @@ export default function LandingPage() {
                         />
                       </div>
                     </DialogTrigger>
-                    {/* THÊM VÀO: Nội dung của Dialog khi click vào ảnh */}
+
                     <DialogContent className="max-w-6xl p-4">
-                      {/* Thêm DialogHeader và DialogTitle với class sr-only để ẩn đi tránh gây lỗi accessibility */}
                       <DialogHeader>
                         <DialogTitle className="sr-only">
                           {activeGuide.title}

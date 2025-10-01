@@ -4,17 +4,13 @@ import { db } from "@/lib/prisma";
 import { checkUser } from "@/lib/checkUser";
 import { revalidatePath } from "next/cache";
 
-// Sửa 1: Dùng thư viện @google/generative-ai trực tiếp cho nhất quán
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Sửa 2: Khởi tạo model giống như các file actions/cover-letter.js, actions/resume.js
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-// Hàm tiện ích delay
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Hàm tìm việc bằng JSearch API
 async function searchJobsWithJSearch(query, page = 1) {
   const JSEARCH_API_KEY = process.env.NEXT_PUBLIC_JSEARCH_API_KEY;
   if (!JSEARCH_API_KEY) {
@@ -46,7 +42,6 @@ async function searchJobsWithJSearch(query, page = 1) {
   return result.data;
 }
 
-// Hàm tìm việc bằng AI (Fallback)
 async function searchJobsWithAI(query, page = 1) {
   const prompt = `
       Act as an expert job search engine. Find up to 10 REAL and RECENT job postings from prominent Vietnamese job sites (TopCV, VietnamWorks, ITviec, LinkedIn) based on the query "${query}".
@@ -68,23 +63,20 @@ async function searchJobsWithAI(query, page = 1) {
   return JSON.parse(cleanedJson);
 }
 
-// --- HÀM SEARCHJOBS CHÍNH ĐÃ ĐƯỢC NÂNG CẤP ---
 export async function searchJobs(query, page = 1) {
-  // === Logic JSearch với Retry ===
   let jobsFromAPI = null;
   const maxRetries = 3;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       jobsFromAPI = await searchJobsWithJSearch(query, page);
       if (jobsFromAPI && jobsFromAPI.length > 0) {
-        // Nếu thành công, thoát khỏi vòng lặp
         break;
       }
       console.log(
         `JSearch attempt ${attempt} returned empty data. Retrying...`
       );
       if (attempt < maxRetries) {
-        await delay(attempt * 1000); // Delay 1s, 2s, 3s
+        await delay(attempt * 1000);
       }
     } catch (error) {
       console.error(`JSearch attempt ${attempt} failed:`, error);
@@ -94,7 +86,6 @@ export async function searchJobs(query, page = 1) {
     }
   }
 
-  // === Xử lý kết quả ===
   try {
     // Ưu tiên kết quả từ JSearch
     if (jobsFromAPI && jobsFromAPI.length > 0) {
@@ -109,7 +100,7 @@ export async function searchJobs(query, page = 1) {
         source: job.employer_website
           ? new URL(job.employer_website).hostname.replace("www.", "")
           : "N/A",
-        sourceType: "JSearch", // Gắn nhãn
+        sourceType: "JSearch",
       }));
       return { success: true, data: formattedJobs };
     }
@@ -119,7 +110,7 @@ export async function searchJobs(query, page = 1) {
     const jobsFromAI = await searchJobsWithAI(query, page);
     const formattedJobs = jobsFromAI.map((job) => ({
       ...job,
-      sourceType: "Google Search", // Gắn nhãn
+      sourceType: "Google Search",
     }));
     return { success: true, data: formattedJobs };
   } catch (error) {
@@ -128,13 +119,11 @@ export async function searchJobs(query, page = 1) {
   }
 }
 
-// Cập nhật hàm saveJob để lưu cả sourceType
 export async function saveJob(jobData) {
   const user = await checkUser();
   if (!user) throw new Error("Unauthorized");
 
   try {
-    // Dùng URL làm khóa chính để tránh trùng lặp
     const existingJob = await db.savedJob.findFirst({
       where: {
         userId: user.id,
@@ -159,7 +148,7 @@ export async function saveJob(jobData) {
         description: jobData.description,
         url: jobData.url,
         source: jobData.source,
-        sourceType: jobData.sourceType, // <<< THÊM DÒNG NÀY
+        sourceType: jobData.sourceType,
       },
     });
     revalidatePath("/job-search");

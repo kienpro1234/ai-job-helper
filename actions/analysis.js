@@ -24,7 +24,6 @@ export const getAnalysisHistory = async (resumeId) => {
   return { success: true, data: history };
 };
 
-// THAY ĐỔI 2: Cập nhật `saveResumeAnalysis` để lưu thêm `inlineFeedback`
 export const saveResumeAnalysis = async (
   analysisData,
   jobDescription,
@@ -36,7 +35,6 @@ export const saveResumeAnalysis = async (
   if (!user) throw new Error("Unauthorized");
   if (!resumeId) throw new Error("Resume ID is required");
 
-  // Gọi hàm định dạng JD bằng AI
   const formattedJD = await formatJDWithAI(jobDescription);
 
   try {
@@ -78,7 +76,7 @@ export const deleteResumeAnalysis = async (analysisId) => {
     await db.resumeAnalysis.delete({
       where: {
         id: analysisId,
-        // Đảm bảo người dùng chỉ có thể xóa phân tích của chính họ
+
         userId: user.id,
       },
     });
@@ -104,11 +102,10 @@ export async function deleteMultipleResumeAnalyses(ids) {
         id: {
           in: ids,
         },
-        userId: user.id, // Đảm bảo người dùng chỉ xóa phân tích của họ
+        userId: user.id,
       },
     });
 
-    // Client sẽ gọi router.refresh(), nên không cần revalidatePath ở đây
     return { success: true, count: result.count };
   } catch (error) {
     console.error("Error deleting multiple analyses:", error);
@@ -138,7 +135,7 @@ async function formatJDWithAI(plainTextJD) {
     return result.response.text().trim();
   } catch (error) {
     console.error("Lỗi định dạng JD bằng AI:", error);
-    // Nếu lỗi, trả về JD gốc trong thẻ <pre> để giữ nguyên định dạng
+
     return `<pre>${plainTextJD}</pre>`;
   }
 }
@@ -159,7 +156,6 @@ export const analyzeResumeWithJD = async (jobDescription, resumeId) => {
 
   const resumeText = userResume.content;
 
-  // --- PROMPT ĐƯỢC TỐI ƯU HÓA ĐỂ ĐỒNG BỘ HÓA DỮ LIỆU ---
   const prompt = `
     As an elite career coach, analyze the resume against the job description.
     Your primary task is to generate DETAILED, section-by-section inline feedback.
@@ -195,18 +191,14 @@ export const analyzeResumeWithJD = async (jobDescription, resumeId) => {
     const text = result.response.text();
     const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
 
-    // Dữ liệu thô từ AI
     const aiResult = JSON.parse(cleanedText);
 
-    // TỰ ĐỘNG TẠO RA DỮ LIỆU ĐỒNG BỘ
-    // Biến đổi kết quả từ AI để tạo ra cấu trúc dữ liệu cuối cùng
     const finalResult = {
       generalAnalysis: {
         matchScore: aiResult.matchScore,
         missingKeywords: aiResult.missingKeywords,
         summary: aiResult.summary,
-        // suggestions được tạo trực tiếp từ các giá trị của inlineFeedback
-        // Điều này đảm bảo chúng luôn đồng bộ 100%
+
         suggestions: Object.values(aiResult.inlineFeedback).filter(Boolean),
       },
       inlineFeedback: aiResult.inlineFeedback,
@@ -219,7 +211,6 @@ export const analyzeResumeWithJD = async (jobDescription, resumeId) => {
   }
 };
 
-// THAY ĐỔI 3: `getInlineFeedback` giờ chỉ đọc từ DB, không gọi AI nữa
 export const getInlineFeedback = async (analysisId) => {
   const user = await checkUser();
   if (!user) throw new Error("Unauthorized");

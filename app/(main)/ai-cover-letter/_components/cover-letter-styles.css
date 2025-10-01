@@ -1,5 +1,3 @@
-/* app/(main)/ai-cover-letter/_components/cover-letter-styles.css */
-
 .letter-container {
   @apply bg-gray-100 dark:bg-gray-900 p-4 sm:p-8 rounded-lg;
 }
@@ -51,11 +49,11 @@
   position: absolute;
   left: -9999px;
   top: auto;
-  width: 210mm; /* A4 width */
+  width: 210mm; /* A4  */
   background: white;
 }
 
-/* --- CSS TỐI ƯU HÓA CHO PDF (QUAN TRỌNG) --- */
+/* --- CSS TỐI ƯU HÓA CHO PDF --- */
 @media print {
   body {
     background-color: #fff !important;
@@ -65,7 +63,7 @@
     box-shadow: none !important;
     margin: 0 !important;
     padding: 0 !important;
-    /* Giảm cỡ chữ và khoảng cách dòng hơn nữa */
+
     font-size: 11pt;
     line-height: 1.35;
   }
@@ -77,19 +75,19 @@
 
   .letter-contact-info {
     margin-top: 4px;
-    gap: 1rem; /* Giảm khoảng cách giữa các mục contact */
+    gap: 1rem;
   }
 
   .letter-header {
-    margin-bottom: 2rem; /* Giảm khoảng cách dưới header */
+    margin-bottom: 2rem;
   }
 
   .letter-meta {
-    margin-bottom: 2rem; /* Giảm khoảng cách dưới meta */
+    margin-bottom: 2rem;
   }
 
   .letter-body p {
-    margin-bottom: 10px; /* Giảm khoảng cách giữa các đoạn văn */
+    margin-bottom: 10px;
   }
 
   .letter-signature {

@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-// import { revalidatePath } from "next/cache";
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// Import hàm checkUser để sử dụng nhất quán
+
 import { checkUser } from "@/lib/checkUser";
 import { revalidatePath } from "next/cache";
 
@@ -27,23 +27,17 @@ export async function getResumesWithPagination({ page = 1, limit = 10 }) {
   return { resumes, total };
 }
 
-// =================================================================
-// CÁC ACTION ĐÃ ĐƯỢC SỬA LỖI VÀ ĐỒNG BỘ
-// =================================================================
-
 export async function createResume(title, content) {
-  // Sửa ở đây: Dùng checkUser()
   const user = await checkUser();
 
   const newResume = await db.resume.create({
     data: {
-      userId: user.id, // Dùng user.id từ checkUser
+      userId: user.id,
       title,
       content,
     },
   });
 
-  // revalidatePath("/resume");
   return newResume;
 }
 
@@ -53,7 +47,7 @@ export async function updateResume(id, title, content) {
   const updatedResume = await db.resume.update({
     where: {
       id: id,
-      userId: user.id, // Đảm bảo người dùng chỉ sửa CV của mình
+      userId: user.id,
     },
     data: {
       title,
@@ -73,11 +67,11 @@ export async function deleteResume(id) {
     await db.resume.delete({
       where: {
         id: id,
-        userId: user.id, // Đảm bảo người dùng chỉ xóa CV của chính mình
+        userId: user.id,
       },
     });
 
-    revalidatePath("/resume"); // Làm mới lại danh sách CV
+    revalidatePath("/resume");
     return { success: true };
   } catch (error) {
     console.error("Lỗi xóa CV:", error);
@@ -92,9 +86,9 @@ export async function deleteMultipleResumes(ids) {
     await db.resume.deleteMany({
       where: {
         id: {
-          in: ids, // Xóa tất cả các CV có id trong danh sách ids
+          in: ids,
         },
-        userId: user.id, // Đảm bảo an toàn
+        userId: user.id,
       },
     });
 
@@ -107,7 +101,6 @@ export async function deleteMultipleResumes(ids) {
 }
 
 export async function getResumes() {
-  // Sửa ở đây: Dùng checkUser()
   const user = await checkUser();
 
   return await db.resume.findMany({
@@ -117,20 +110,18 @@ export async function getResumes() {
 }
 
 export async function getResume(id) {
-  // Sửa ở đây: Dùng checkUser()
   const user = await checkUser();
   if (!id) return null;
 
   return await db.resume.findUnique({
     where: {
       id: id,
-      userId: user.id, // Đảm bảo an toàn
+      userId: user.id,
     },
   });
 }
 
 export const improveWithAI = async ({ current, type }) => {
-  // Hàm này đã đúng, giữ nguyên
   const user = await checkUser();
 
   const prompt = `

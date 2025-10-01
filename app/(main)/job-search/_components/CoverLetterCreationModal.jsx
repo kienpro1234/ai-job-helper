@@ -1,4 +1,3 @@
-// app/(main)/job-search/_components/CoverLetterCreationModal.jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -50,8 +49,8 @@ export function CoverLetterCreationModal({ job, open, onOpenChange }) {
     if (user && open) {
       setValue("yourName", user.fullName || "");
       setValue("yourEmail", user.primaryEmailAddress?.emailAddress || "");
-      // Giả sử bạn đã lưu address và phone trong user metadata
-      // Nếu không, bạn có thể để trống hoặc lấy từ nơi khác
+      // Giả sử đã lưu address và phone trong user metadata
+      // Nếu không,có thể để trống hoặc lấy từ nơi khác
       setValue("yourPhone", user.unsafeMetadata?.phone || "");
       setValue("yourAddress", user.unsafeMetadata?.address || "");
     }

@@ -1,4 +1,3 @@
-// app/(main)/ai-cover-letter/[id]/page.jsx
 "use client";
 
 import { useEffect, useState, useRef, use } from "react";
@@ -129,13 +128,11 @@ export default function EditCoverLetterPage({ params }) {
   };
 
   const generateImage = async (qualityScale = 2) => {
-    // Giữ nguyên ref của bạn
     if (!exportRef.current) {
       toast.error("Không tìm thấy phần tử để xuất ảnh.");
       return;
     }
 
-    // Đổi lại thành isProcessing để đồng bộ với các hàm khác
     setIsProcessing(true);
     toast.info(`Đang tạo ảnh chất lượng ${qualityScale}x...`);
 
@@ -146,7 +143,7 @@ export default function EditCoverLetterPage({ params }) {
       const rect = element.getBoundingClientRect();
 
       // Bước 1: Chuyển đổi HTML thành SVG.
-      // Đây là bước quan trọng nhất để giữ lại đúng style và font.
+
       const svgDataUrl = await htmlToImage.toSvg(element, {
         cacheBust: true, // Giúp tải lại các tài nguyên nếu cần
         width: rect.width,

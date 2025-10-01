@@ -60,37 +60,6 @@ export function ResumeSelectionModal({ job, open, onOpenChange }) {
   //   setShowAnalyzer(true);
   // };
 
-  // if (showAnalyzer && selectedResume) {
-  //   return (
-  //     <Dialog open={open} onOpenChange={onOpenChange}>
-  //       <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
-  //         <DialogHeader>
-  //           <div className="flex items-center gap-4">
-  //             <Button
-  //               variant="outline"
-  //               size="icon"
-  //               onClick={() => setShowAnalyzer(false)}
-  //               className="flex-shrink-0"
-  //             >
-  //               <ArrowLeft className="h-4 w-4" />
-  //               <span className="sr-only">Back</span>
-  //             </Button>
-  //             <DialogTitle className="truncate">
-  //               Đánh giá CV cho vị trí "{job.title}"
-  //             </DialogTitle>
-  //           </div>
-  //         </DialogHeader>
-  //         <div className="overflow-y-auto">
-  //           <ResumeAnalyzer
-  //             resumeId={selectedResume.id}
-  //             initialJd={job.description}
-  //           />
-  //         </div>
-  //       </DialogContent>
-  //     </Dialog>
-  //   );
-  // }
-
   // HANDLERS
   const handlePreview = (resume) => {
     setSelectedResume(resume);
@@ -248,69 +217,6 @@ export function ResumeSelectionModal({ job, open, onOpenChange }) {
   };
 
   return (
-    // <Dialog open={open} onOpenChange={onOpenChange}>
-    //   <DialogContent className="sm:max-w-3xl">
-    //     <DialogHeader>
-    //       <DialogTitle>
-    //         Chọn CV để đánh giá cho vị trí "{job.title}"
-    //       </DialogTitle>
-    //     </DialogHeader>
-    //     {isPending ? (
-    //       <div className="flex justify-center items-center h-40">
-    //         <Loader2 className="animate-spin" />
-    //       </div>
-    //     ) : (
-    //       <div className="space-y-4">
-    //         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    //           {resumes.map((resume) => (
-    //             <Card
-    //               key={resume.id}
-    //               className="cursor-pointer hover:border-primary"
-    //             >
-    //               <CardHeader onClick={() => handleSelectResume(resume)}>
-    //                 <div className="flex items-start gap-4">
-    //                   <FileText className="h-6 w-6 mt-1 text-primary" />
-    //                   <div>
-    //                     <CardTitle>{resume.title}</CardTitle>
-    //                     <CardDescription>
-    //                       Cập nhật:{" "}
-    //                       {format(new Date(resume.updatedAt), "dd/MM/yyyy")}
-    //                     </CardDescription>
-    //                   </div>
-    //                 </div>
-    //               </CardHeader>
-    //             </Card>
-    //           ))}
-    //         </div>
-    //         <div className="flex justify-between items-center">
-    //           <Button
-    //             onClick={() => setPage((p) => Math.max(1, p - 1))}
-    //             disabled={page === 1}
-    //           >
-    //             <ChevronLeft /> Previous
-    //           </Button>
-    //           <span>
-    //             Page {page} of {totalPages}
-    //           </span>
-    //           <Button
-    //             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-    //             disabled={page === totalPages}
-    //           >
-    //             Next <ChevronRight />
-    //           </Button>
-    //         </div>
-    //         <div className="text-center">
-    //           <Button
-    //             variant="link"
-    //             onClick={() => router.push(`/resume/${selectedResume.id}`)}
-    //           >
-    //             Xem chi tiết CV
-    //           </Button>
-    //         </div>
-    //       </div>
-    //     )}
-    //   </DialogContent>
-    // </Dialog>
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>

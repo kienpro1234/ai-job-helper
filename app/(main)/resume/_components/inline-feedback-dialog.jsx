@@ -1,4 +1,3 @@
-// app/(main)/resume/_components/inline-feedback-dialog.jsx
 "use client";
 
 import { useEffect, useState } from "react";

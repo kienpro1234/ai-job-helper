@@ -1,5 +1,3 @@
-// File: ai-job-help/app/(main)/resume/_components/resume-list.jsx
-
 "use client";
 
 import Link from "next/link";
@@ -179,7 +177,6 @@ export function ResumeList({ initialResumes }) {
                     : undefined
                 }
               >
-                {/* === SỬA LỖI QUAN TRỌNG TẠI ĐÂY === */}
                 {isBulkDeleteMode ? (
                   // Ở chế độ xóa: render nội dung trực tiếp, không có Link
                   <div className="flex flex-col flex-grow">

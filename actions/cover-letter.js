@@ -77,7 +77,6 @@ export async function generateCoverLetter(data) {
       },
     });
 
-    // Thêm revalidatePath để cập nhật danh sách ngay lập tức
     revalidatePath("/ai-cover-letter");
     return coverLetter;
   } catch (error) {
@@ -142,14 +141,13 @@ export async function deleteCoverLetter(id) {
       },
     });
     revalidatePath("/ai-cover-letter");
-    return { success: true }; // Trả về object để client dễ xử lý
+    return { success: true };
   } catch (error) {
     console.error("Lỗi xóa cover letter:", error);
     return { success: false, error: "Không thể xóa cover letter." };
   }
 }
 
-// HÀM MỚI ĐỂ XÓA HÀNG LOẠT
 export async function deleteMultipleCoverLetters(ids) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -186,7 +184,7 @@ export async function updateCoverLetter(id, data) {
     const updatedCoverLetter = await db.coverLetter.update({
       where: {
         id: id,
-        userId: user.id, // Đảm bảo người dùng chỉ có thể sửa cover letter của mình
+        userId: user.id,
       },
       data: {
         content: data.content,
@@ -195,7 +193,6 @@ export async function updateCoverLetter(id, data) {
       },
     });
 
-    // Revalidate lại cache cho các trang liên quan để hiển thị dữ liệu mới nhất
     revalidatePath("/ai-cover-letter");
     revalidatePath(`/ai-cover-letter/${id}`);
 

@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 const ResumeAnalyzer = ({ resumeId, initialJd = "", job = null }) => {
   const router = useRouter();
   const [jobDescription, setJobDescription] = useState(initialJd || "");
-  // State này giờ sẽ lưu cả generalAnalysis và inlineFeedback
+  // State này lưu cả generalAnalysis và inlineFeedback
   const [analysisResult, setAnalysisResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

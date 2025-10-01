@@ -1,16 +1,12 @@
-/* ai-job-help/app/(main)/resume/resume-styles.css */
-
 /* Tổng thể CV container */
 .resume-container {
-  /* THAY ĐỔI: Giảm padding hơn nữa, p-4 (16px) trên mobile và p-6 (24px) trên desktop */
   @apply bg-white text-gray-800 rounded-lg shadow-2xl p-4 md:p-6 font-sans;
   font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- PHẦN HEADER --- */
-/* YÊU CẦU 1: Đảm bảo tên (h1) luôn được căn giữa */
+/* --- HEADER --- */
 .resume-container h1,
 .resume-container .resume-name {
   @apply relative text-4xl font-bold text-center text-gray-800 tracking-tight pb-3; /* Chỉ dùng padding-bottom */
@@ -23,13 +19,12 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 1px; /* Đường kẻ mỏng hơn cho tên */
-  background-color: #374151; /* Màu xám đậm (gray-700) */
+  height: 1px;
+  background-color: #374151;
 }
 
 /* Phần thông tin liên hệ */
 .contact-info {
-  /* Tăng margin-top để tạo khoảng cách với đường kẻ của H1 */
   @apply text-center text-sm text-gray-500 mt-4 mb-6 flex justify-center items-center flex-wrap gap-x-4 gap-y-1;
 }
 
@@ -52,8 +47,8 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 2px; /* Độ dày của đường kẻ */
-  background-color: #bfdbfe; /* Mã màu của border-blue-200 */
+  height: 2px;
+  background-color: #bfdbfe;
 }
 
 .resume-container h2:first-of-type {

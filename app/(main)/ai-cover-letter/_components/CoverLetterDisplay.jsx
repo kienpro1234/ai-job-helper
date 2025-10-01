@@ -1,7 +1,3 @@
-// app/(main)/ai-cover-letter/_components/CoverLetterDisplay.jsx
-
-// ... (các import và phần đầu component giữ nguyên)
-
 const parseCoverLetter = (markdown) => {
   if (!markdown) return {};
 
@@ -20,7 +16,6 @@ const parseCoverLetter = (markdown) => {
   let state = "header";
 
   for (const line of lines) {
-    // ... (vòng lặp for giữ nguyên)
     if (line.startsWith("**Subject:")) {
       state = "body";
       result.body.push(line);
@@ -63,12 +58,12 @@ const parseCoverLetter = (markdown) => {
         break;
       case "signature":
         result.signature = line;
-        state = "done"; // Stop parsing
+        state = "done";
         break;
     }
   }
 
-  // --- BẮT ĐẦU PHẦN SỬA LỖI LOGIC TÁCH CHUỖI ---
+  // --- LOGIC TÁCH CHUỖI ---
   result.name = result.header[0] || "[Your Name]";
 
   const remainingHeaderLines = result.header.slice(1);
@@ -77,7 +72,7 @@ const parseCoverLetter = (markdown) => {
   const addressParts = [];
 
   const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
-  // Regex linh hoạt hơn cho số điện thoại Việt Nam
+  // Regex linh hoạt cho số điện thoại Việt Nam
   const phoneRegex = /(?:\(?\d{3,4}\)?[-.\s]?)?\d{3}[-.\s]?\d{3,4}/;
 
   remainingHeaderLines.forEach((line) => {
@@ -94,12 +89,10 @@ const parseCoverLetter = (markdown) => {
   result.phone = phone;
   result.email = email;
   result.address = addressParts.join(", ").trim(); // Nối các phần địa chỉ lại với nhau
-  // --- KẾT THÚC PHẦN SỬA LỖI ---
 
   return result;
 };
 
-// ... (phần còn lại của component CoverLetterDisplay giữ nguyên)
 const CoverLetterDisplay = ({ content }) => {
   const data = parseCoverLetter(content);
 
@@ -132,7 +125,7 @@ const CoverLetterDisplay = ({ content }) => {
         <div className="letter-body">
           <p className="font-semibold">{data.salutation}</p>
           {data.body.map((paragraph, i) => (
-            // Xử lý markdown đơn giản cho đậm và nghiêng
+            // Xử lý markdown cho đậm và nghiêng
             <p
               key={i}
               dangerouslySetInnerHTML={{

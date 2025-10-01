@@ -14,8 +14,7 @@ export default async function EditResumePage({ params }) {
   // Phân tích nội dung markdown để lấy dữ liệu cho các section
   const initialData = parseCvMarkdown(resume.content);
 
-  // THÊM VÀO: Gán title của CV vào initialData
-  // Vì title được lưu riêng, không nằm trong content markdown
+  // Gán title của CV vào initialData vì title được lưu riêng, không nằm trong content markdown
   initialData.title = resume.title;
 
   return (

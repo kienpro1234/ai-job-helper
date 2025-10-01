@@ -74,7 +74,7 @@ export default function ResumeBuilder({
 
   const { loading: isUpdating, fn: updateResumeFn } = useFetch(updateResume);
 
-  // New fetch hook for AI improvement
+  // Fetch hook for AI improvement
   const {
     loading: isImproving,
     fn: improveWithAIFn,
@@ -119,7 +119,7 @@ export default function ResumeBuilder({
     }
   }, [saveResult, saveError, isSaving]);
 
-  // SỬA LỖI 2: Dùng useEffect để xử lý kết quả từ AI
+  // Dùng useEffect để xử lý kết quả từ AI
   useEffect(() => {
     if (!isImproving && improvedContent && improvingSection) {
       if (
@@ -262,7 +262,7 @@ export default function ResumeBuilder({
             {resumeId && (
               <Button
                 variant="outline"
-                type="button" // Quan trọng: để không submit form
+                type="button"
                 onClick={() => router.push(`/resume/${resumeId}`)}
               >
                 <X className="h-4 w-4 mr-2" />

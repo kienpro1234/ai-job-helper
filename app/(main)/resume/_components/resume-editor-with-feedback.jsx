@@ -27,46 +27,6 @@ const editorSchema = z.object({
   projects: z.array(entrySchema),
 });
 
-// Helper functions for parsing
-// function parseEntries(sectionContent) {
-//   if (!sectionContent) return [];
-//   const entryParts = sectionContent.split(/\n?(?=###\s)/).filter(Boolean);
-//   return entryParts
-//     .map((part) => {
-//       const lines = part.trim().split("\n");
-//       const entry = {
-//         title: "",
-//         organization: "",
-//         startDate: "",
-//         endDate: "",
-//         description: "",
-//         current: false,
-//       };
-//       const headerMatch = lines[0]?.match(/###\s*\*\*(.+?)\*\* at \*(.+?)\*/);
-//       if (headerMatch) {
-//         entry.title = headerMatch[1]?.trim();
-//         entry.organization = headerMatch[2]?.trim();
-//       }
-//       const dateMatch = lines[1]?.match(/\*(.+?)\*/);
-//       if (dateMatch) {
-//         const [startDate, endDate] = dateMatch[1]
-//           .split(" - ")
-//           .map((d) => d.trim());
-//         entry.startDate = startDate;
-//         if (endDate && endDate.toLowerCase() === "present") {
-//           entry.endDate = "";
-//           entry.current = true;
-//         } else {
-//           entry.endDate = endDate || "";
-//           entry.current = false;
-//         }
-//       }
-//       entry.description = lines.slice(2).join("\n").trim();
-//       return entry;
-//     })
-//     .filter((e) => e.title);
-// }
-
 function parseEntries(sectionContent) {
   if (!sectionContent) return [];
   const entryParts = sectionContent.split(/\n?(?=###\s)/).filter(Boolean);
@@ -235,7 +195,7 @@ export function ResumeEditorWithFeedback({
     }
   }, [initialContent, analysis, reset]);
 
-  // SỬA LỖI 2: Dùng useEffect để xử lý kết quả
+  // Dùng useEffect để xử lý kết quả
   useEffect(() => {
     if (!isImproving && improvedContent && improvingSection) {
       if (
@@ -253,7 +213,7 @@ export function ResumeEditorWithFeedback({
     }
   }, [improvedContent, isImproving, improvingSection, setValue]);
 
-  // SỬA LỖI 3: Cập nhật lại hàm xử lý click
+  // hàm xử lý click
   const handleImproveSection = async (section) => {
     const currentValue = getValues(section);
     const feedback = analysis?.inlineFeedback?.[section];

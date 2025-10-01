@@ -1,4 +1,3 @@
-// app/resume/_components/entry-form.jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -96,7 +95,6 @@ export function EntryForm({ type, entries, onChange }) {
   };
 
   const handleCancel = () => {
-    // reset();
     setEditIndex(null);
   };
 
@@ -126,7 +124,6 @@ export function EntryForm({ type, entries, onChange }) {
     onChange(newEntries);
   };
 
-  // AI Improvement Logic (no changes here)
   const {
     loading: isImproving,
     fn: improveWithAIFn,

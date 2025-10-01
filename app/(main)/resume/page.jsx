@@ -6,8 +6,7 @@ import { ResumeList } from "@/app/(main)/resume/_components/resume-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function ResumePage() {
-  // Chuyển thành async function
-  const resumes = await getResumes(); // Lấy dữ liệu CV ở đây
+  const resumes = await getResumes(); // Lấy dữ liệu CV
 
   return (
     <div className="container mx-auto py-6">

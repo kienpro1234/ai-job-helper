@@ -91,11 +91,9 @@ export default function SavedJobsTab({ initialSavedJobs }) {
     });
   };
 
-  // === PHẦN SỬA LỖI: KHÔI PHỤC LẠI LOGIC CHO HÀM NÀY ===
   const handleGenerateCoverLetter = (job) => {
     setJobForLetter(job); // Mở modal bằng cách set job
   };
-  // =======================================================
 
   const toggleBulkDeleteMode = () => {
     setIsBulkDeleteMode((prev) => !prev);

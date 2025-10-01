@@ -1,17 +1,10 @@
-// Trong file: app/(main)/resume/[id]/page.jsx
-
-// Giữ nguyên import này, nó đã đúng
 import { getResume } from "@/actions/resume";
-
-// SỬA LỖI Ở 2 DÒNG IMPORT DƯỚI ĐÂY:
-// Dùng đường dẫn tương đối để đi từ thư mục [id] ra ngoài rồi vào _components
 import { AnalysisHistory } from "../_components/analysis-history";
 import { ResumeViewer } from "../_components/resume-viewer";
 import { getAnalysisHistory } from "@/actions/analysis";
 
 export default async function ResumeDetailPage({ params }) {
   const { id } = await params;
-  // Lấy cả hai dữ liệu song song để tối ưu tốc độ
   const [resume, historyResult] = await Promise.all([
     getResume(id),
     getAnalysisHistory(id),

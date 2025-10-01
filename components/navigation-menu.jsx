@@ -1,5 +1,3 @@
-// File: ai-job-help/components/navigation-menu.jsx
-
 "use client";
 
 import Link from "next/link";
@@ -13,10 +11,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Component Link điều hướng đã được nâng cấp
 const NavLink = ({ href, children }) => {
   const pathname = usePathname();
-  // Một link được coi là active nếu URL hiện tại bắt đầu bằng href của link đó
+  // link được coi là active nếu URL hiện tại bắt đầu bằng href của link đó
   // Ví dụ: khi ở /resume/some-id, link /resume vẫn sẽ active
   const isActive = pathname.startsWith(href);
 

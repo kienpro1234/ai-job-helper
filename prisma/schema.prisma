@@ -27,7 +27,7 @@ model User {
   skills        String[]  // Array of skills
   assessments   Assessment[]
 
-  //Sửa ở đây để 1 user có thể có nhiều resume
+  
   resume        Resume[]
   coverLetter   CoverLetter[]
   savedJobs     SavedJob[]

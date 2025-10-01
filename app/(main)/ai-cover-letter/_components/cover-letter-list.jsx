@@ -1,5 +1,3 @@
-// File: ai-job-help/app/(main)/ai-cover-letter/_components/cover-letter-list.jsx
-
 "use client";
 
 import Link from "next/link";
@@ -167,7 +165,6 @@ export default function CoverLetterList({ coverLetters: initialCoverLetters }) {
           const isSelected = selectedLetters.has(letter.id);
           const title = `${letter.jobTitle} at ${letter.companyName}`;
 
-          // Nội dung card không bao gồm các nút hành động
           const CardInnerContent = (
             <>
               <CardHeader>
@@ -228,7 +225,6 @@ export default function CoverLetterList({ coverLetters: initialCoverLetters }) {
                 )}
               </Card>
 
-              {/* === PHẦN SỬA LỖI: TẤT CẢ CÁC NÚT HÀNH ĐỘNG NẰM NGOÀI LINK === */}
               {!isBulkDeleteMode && (
                 <div className="absolute top-4 right-4 z-10 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button

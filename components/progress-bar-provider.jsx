@@ -1,5 +1,3 @@
-// File: ai-job-help/components/progress-bar-provider.jsx
-
 "use client";
 
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
