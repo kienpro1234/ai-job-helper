@@ -10,22 +10,33 @@
 }
 
 .letter-header {
-  @apply text-center border-b-2 border-gray-300 pb-4 mb-8;
+  @apply text-center border-b-2 border-gray-300 pb-6 mb-8;
 }
 
-.letter-name {
-  @apply text-3xl font-bold tracking-wider uppercase;
-  color: #5d6d7e;
+/* Tiêu đề công việc */
+.letter-job-title {
+  @apply text-3xl font-bold tracking-wider uppercase mb-4;
+  color: #34495e;
 }
 
+/* === PHẦN CSS SỬA LẠI CHO LAYOUT HÀNG NGANG === */
+
+/* Container flex để dàn hàng ngang */
 .letter-contact-info {
-  @apply flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600 mt-2;
+  @apply flex justify-center items-center flex-wrap gap-x-2 text-sm text-gray-600;
 }
 
-.letter-contact-info span {
-  @apply flex items-center gap-2;
+/* Mỗi phần tử thông tin (tên, sđt, email, địa chỉ) */
+.contact-part {
+  @apply flex items-center gap-2; /* Thêm gap để icon và text cách nhau */
 }
 
+/* Dấu ngăn cách */
+.separator {
+  @apply text-gray-400;
+}
+
+/* Phần còn lại giữ nguyên */
 .letter-meta {
   @apply mb-8 text-sm leading-relaxed;
 }
