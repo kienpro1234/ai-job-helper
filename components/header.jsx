@@ -150,15 +150,17 @@ export default async function Header() {
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex-shrink-0">
-          <Link href="/">
+        <div className="flex items-center h-full flex-shrink-0">
+          <Link href="/" className="h-full w-32 flex items-center">
+            {" "}
+            {/* Thêm w-32 để cố định chiều rộng */}
             <Image
-              src={"/new-logo-2.png"}
+              src={"/new-logo-3.png"}
               alt="Prepin Logo"
-              width={400}
-              height={200}
+              width={120}
+              height={40}
               quality={100}
-              className="h-52 py-1 w-auto object-contain"
+              className="w-full h-full object-contain" // Để ảnh lấp đầy thẻ Link
             />
           </Link>
         </div>

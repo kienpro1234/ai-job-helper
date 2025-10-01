@@ -1,7 +1,7 @@
 // app/(main)/ai-cover-letter/[id]/page.jsx
 "use client";
 
-import { use, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -11,9 +11,13 @@ import {
   Loader2,
   Image as ImageIcon,
   ChevronDown,
+  Edit,
+  Save,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCoverLetter } from "@/actions/cover-letter";
+import { Input } from "@/components/ui/input";
+import { getCoverLetter, updateCoverLetter } from "@/actions/cover-letter";
 import CoverLetterDisplay from "../_components/CoverLetterDisplay";
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 import * as htmlToImage from "html-to-image";
@@ -28,18 +32,25 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuPortal,
-} from "@/components/ui/dropdown-menu"; // Thêm các import cho DropdownMenu
-
-// Import CSS
-import "../_components/cover-letter-styles.css";
+} from "@/components/ui/dropdown-menu";
+import MDEditor from "@uiw/react-md-editor";
 import { toast } from "sonner";
+
+import "../_components/cover-letter-styles.css";
 
 export default function EditCoverLetterPage({ params }) {
   const exportRef = useRef(null);
   const { id } = use(params);
   const [coverLetter, setCoverLetter] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false); // State chung cho PDF và Image
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // State cho chế độ chỉnh sửa
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState("");
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedCompany, setEditedCompany] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -48,8 +59,15 @@ export default function EditCoverLetterPage({ params }) {
         try {
           const letter = await getCoverLetter(id);
           setCoverLetter(letter);
+          // Khởi tạo giá trị cho các state chỉnh sửa
+          if (letter) {
+            setEditedContent(letter.content);
+            setEditedTitle(letter.jobTitle);
+            setEditedCompany(letter.companyName);
+          }
         } catch (error) {
           console.error("Failed to fetch cover letter:", error);
+          toast.error("Failed to fetch cover letter.");
         } finally {
           setIsLoading(false);
         }
@@ -57,6 +75,37 @@ export default function EditCoverLetterPage({ params }) {
       fetchLetter();
     }
   }, [id]);
+
+  const handleEdit = () => {
+    if (!coverLetter) return;
+    setEditedContent(coverLetter.content);
+    setEditedTitle(coverLetter.jobTitle);
+    setEditedCompany(coverLetter.companyName);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    toast.info("Saving changes...");
+    const result = await updateCoverLetter(id, {
+      content: editedContent,
+      jobTitle: editedTitle,
+      companyName: editedCompany,
+    });
+    setIsSaving(false);
+
+    if (result.success) {
+      toast.success("Cover letter updated successfully!");
+      setCoverLetter(result.data);
+      setIsEditing(false);
+    } else {
+      toast.error(result.error || "Failed to save changes.");
+    }
+  };
 
   const generatePDF = async () => {
     if (!coverLetter || isProcessing) return;
@@ -173,6 +222,7 @@ export default function EditCoverLetterPage({ params }) {
               Back to Cover Letters
             </Button>
           </Link>
+
           <div className="flex items-center gap-2">
             {coverLetter?.sourceType === "JSearch" && coverLetter?.jobUrl && (
               <Button variant="outline" asChild>
@@ -187,75 +237,131 @@ export default function EditCoverLetterPage({ params }) {
               </Button>
             )}
 
-            {/* --- Menu Export Mới --- */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="default" disabled={isProcessing}>
-                  {isProcessing ? (
+            {isEditing ? (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button onClick={handleSave} disabled={isSaving}>
+                  {isSaving ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <Download className="mr-2 h-4 w-4" />
+                    <Save className="mr-2 h-4 w-4" />
                   )}
-                  Export
-                  <ChevronDown className="ml-2 h-4 w-4" />
+                  Save
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Export Options</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={generatePDF}>
-                  <Download className="mr-2 h-4 w-4" />
-                  <span>Download as PDF</span>
-                </DropdownMenuItem>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={handleEdit}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
 
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <ImageIcon className="mr-2 h-4 w-4" />
-                    <span>Download as Image</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem onClick={() => generateImage(2)}>
-                        Standard Quality
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => generateImage(4)}>
-                        High Quality
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => generateImage(6)}>
-                        Ultra Quality
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        <div className="pb-6">
-          <h1 className="text-4xl md:text-5xl font-bold gradient-title">
-            {coverLetter?.jobTitle}
-          </h1>
-          <div className="flex flex-wrap items-center gap-4 mt-2">
-            <p className="text-xl text-muted-foreground">
-              at {coverLetter?.companyName}
-            </p>
-            {coverLetter?.jobSource && (
-              <span className="flex items-center gap-2 text-muted-foreground">
-                <Globe className="h-4 w-4" /> {coverLetter.jobSource}
-              </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="default" disabled={isProcessing}>
+                      {isProcessing ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                      )}
+                      Export
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Export Options</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={generatePDF}>
+                      <Download className="mr-2 h-4 w-4" />
+                      <span>Download as PDF</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        <span>Download as Image</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuItem onClick={() => generateImage(2)}>
+                            Standard Quality
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => generateImage(4)}>
+                            High Quality
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => generateImage(6)}>
+                            Ultra Quality
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             )}
           </div>
         </div>
+
+        {isEditing ? (
+          <div className="pb-6 space-y-4">
+            <Input
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              className="text-4xl md:text-5xl font-bold h-auto p-0 border-0 shadow-none focus-visible:ring-0 gradient-title"
+            />
+            <div className="flex items-center gap-2">
+              <span className="text-xl text-muted-foreground">at</span>
+              <Input
+                value={editedCompany}
+                onChange={(e) => setEditedCompany(e.target.value)}
+                className="text-xl h-auto p-0 border-0 shadow-none focus-visible:ring-0 text-muted-foreground"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="pb-6">
+            <h1 className="text-4xl md:text-5xl font-bold gradient-title">
+              {coverLetter?.jobTitle}
+            </h1>
+            <div className="flex flex-wrap items-center gap-4 mt-2">
+              <p className="text-xl text-muted-foreground">
+                at {coverLetter?.companyName}
+              </p>
+              {coverLetter?.jobSource && (
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Globe className="h-4 w-4" /> {coverLetter.jobSource}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      <CoverLetterDisplay content={coverLetter?.content} />
-
-      <div className="pdf-render-offscreen">
-        <div id="pdf-content" ref={exportRef}>
-          <CoverLetterDisplay content={coverLetter?.content} />
+      {isEditing ? (
+        <div data-color-mode="light" className="mt-4">
+          <MDEditor
+            value={editedContent}
+            onChange={setEditedContent}
+            height={800}
+            preview="live"
+          />
         </div>
-      </div>
+      ) : (
+        <>
+          <CoverLetterDisplay content={coverLetter?.content} />
+          <div className="pdf-render-offscreen">
+            <div id="pdf-content" ref={exportRef}>
+              <CoverLetterDisplay content={coverLetter?.content} />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

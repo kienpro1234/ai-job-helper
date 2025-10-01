@@ -177,3 +177,31 @@ export async function deleteMultipleCoverLetters(ids) {
     return { success: false, error: "Không thể xóa các cover letter đã chọn." };
   }
 }
+
+export async function updateCoverLetter(id, data) {
+  const user = await checkUser();
+  if (!user) throw new Error("Unauthorized");
+
+  try {
+    const updatedCoverLetter = await db.coverLetter.update({
+      where: {
+        id: id,
+        userId: user.id, // Đảm bảo người dùng chỉ có thể sửa cover letter của mình
+      },
+      data: {
+        content: data.content,
+        jobTitle: data.jobTitle,
+        companyName: data.companyName,
+      },
+    });
+
+    // Revalidate lại cache cho các trang liên quan để hiển thị dữ liệu mới nhất
+    revalidatePath("/ai-cover-letter");
+    revalidatePath(`/ai-cover-letter/${id}`);
+
+    return { success: true, data: updatedCoverLetter };
+  } catch (error) {
+    console.error("Error updating cover letter:", error);
+    return { success: false, error: "Failed to update cover letter." };
+  }
+}
