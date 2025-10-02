@@ -53,7 +53,6 @@ export function NavigationMenu() {
         <GraduationCap className="h-4 w-4 mr-1" />
         Interview Prep
       </NavLink>
-      <NavLink href="/test">Test Page</NavLink>
     </div>
   );
 }

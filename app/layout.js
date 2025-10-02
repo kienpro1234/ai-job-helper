@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { dark } from "@clerk/themes";
-import ProgressBarProvider from "@/components/progress-bar-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,11 +34,10 @@ export default function RootLayout({ children }) {
             <Header />
             <main className="min-h-screen">{children}</main>
             <Toaster richColors />
-            <ProgressBarProvider>
-              <Header />
-              <main className="min-h-screen">{children}</main>
-              <Toaster richColors />
-            </ProgressBarProvider>
+
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Toaster richColors />
           </ThemeProvider>
         </body>
       </html>
