@@ -1,6 +1,4 @@
-// File: ai-job-help/app/(main)/resume/page.jsx
-
-import { getResumes } from "@/actions/resume"; // Thêm import này
+import { getResumes } from "@/actions/resume";
 import ResumeBuilder from "@/app/(main)/resume/_components/resume-builder";
 import { ResumeList } from "@/app/(main)/resume/_components/resume-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

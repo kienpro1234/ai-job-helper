@@ -5,13 +5,13 @@ import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 const ProgressBarProvider = ({ children }) => {
   return (
     <>
-      {children}
       <ProgressBar
-        height="2px"
-        color="#ffffff"
+        height="4px"
+        color="#29D"
         options={{ showSpinner: false }}
         shallowRouting
       />
+      {children}
     </>
   );
 };
