@@ -1,4 +1,3 @@
-// app/(main)/resume/_components/resume-editor-with-feedback.jsx
 "use client";
 
 import { useState, useEffect } from "react";

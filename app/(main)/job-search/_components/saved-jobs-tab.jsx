@@ -53,7 +53,7 @@ export default function SavedJobsTab({ initialSavedJobs }) {
   const [isBulkDeleteMode, setIsBulkDeleteMode] = useState(false);
   const [selectedJobs, setSelectedJobs] = useState(new Set());
 
-  // <<< THÊM STATE CHO MODAL >>>
+  // STATE CHO MODAL
   const [jobForLetter, setJobForLetter] = useState(null);
 
   useEffect(() => {

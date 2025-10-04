@@ -19,10 +19,10 @@ export default async function ResumeDetailPage({ params }) {
 
   return (
     <div className="container mx-auto py-6 space-y-8">
-      {/* Component này hiển thị nội dung CV và khu vực phân tích */}
+      {/* Component hiển thị nội dung CV và khu vực phân tích */}
       <ResumeViewer resume={resume} />
 
-      {/* Component này hiển thị lịch sử phân tích của CV này */}
+      {/* Component hiển thị lịch sử phân tích của CV này */}
       <AnalysisHistory resumeId={resume.id} initialHistory={initialHistory} />
     </div>
   );

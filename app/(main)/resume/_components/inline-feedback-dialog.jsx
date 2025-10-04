@@ -105,7 +105,7 @@ export function InlineFeedbackDialog({ analysis, open, onOpenChange }) {
           ) : isEditMode ? (
             <ResumeEditorWithFeedback
               analysis={analysis}
-              initialContent={resumeContent} // <-- **SỬA Ở ĐÂY: Truyền nội dung CV đã fetch**
+              initialContent={resumeContent} // Truyền nội dung CV đã fetch
               onSaveNew={() => onOpenChange(false)}
             />
           ) : (

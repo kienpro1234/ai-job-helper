@@ -32,6 +32,8 @@ model User {
   coverLetter   CoverLetter[]
   savedJobs     SavedJob[]
 
+  voiceInterviewSessions VoiceInterviewSession[]
+
 
   phone         String?   
   address       String?   
@@ -64,6 +66,8 @@ model Resume {
   updatedAt   DateTime  @updatedAt
 
   analyses  ResumeAnalysis[]
+
+  voiceInterviewSessions VoiceInterviewSession[]
 
   @@index([userId]) 
 }
@@ -165,4 +169,21 @@ model SavedJob {
   updatedAt       DateTime  @updatedAt
 
   @@index([userId])
+}
+
+model VoiceInterviewSession {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeId     String
+  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobTitle     String
+  jobDescription String @db.Text
+  transcript   Json?     // Lưu lại toàn bộ cuộc hội thoại dạng { role: 'assistant' | 'user', content: string }[]
+  aiFeedback   String?   @db.Text // Phản hồi tổng quan của AI sau buổi phỏng vấn
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([resumeId])
 }

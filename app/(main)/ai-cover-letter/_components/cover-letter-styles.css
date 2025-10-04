@@ -53,7 +53,7 @@
   background: white;
 }
 
-/* --- CSS TỐI ƯU HÓA CHO PDF --- */
+/* --- CSS CHO PDF --- */
 @media print {
   body {
     background-color: #fff !important;

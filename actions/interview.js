@@ -3,6 +3,13 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getResumes as fetchResumes } from "./resume";
+import { checkUser } from "@/lib/checkUser";
+import { RetellClient } from "retell-sdk";
+
+const retellClient = new RetellClient({
+  apiKey: process.env.RETELL_API_KEY,
+});
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -149,5 +156,71 @@ export async function getAssessments() {
   } catch (error) {
     console.error("Error fetching assessments:", error);
     throw new Error("Failed to fetch assessments");
+  }
+}
+
+export async function getResumesForInterview() {
+  const user = await checkUser();
+  if (!user) return [];
+  return fetchResumes();
+}
+
+export async function getAiInterviewResponse(
+  chatHistory,
+  jobDescription,
+  jobTitle,
+  workExperienceAndProjects
+) {
+  const user = await checkUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  try {
+    const prompt = `You are an expert interviewer named 'Alex' for the position of ${jobTitle}.
+      Your goal is to assess the candidate's suitability based on their resume and the job description.
+      The conversation history is provided below. Your task is to generate the next response for 'Alex'.
+
+      JOB DESCRIPTION:
+      ---
+      ${jobDescription}
+      ---
+
+      CANDIDATE'S RESUME (Work Experience & Projects only):
+      ---
+      ${workExperienceAndProjects}
+      ---
+
+      RULES:
+      1. Keep the conversation natural and professional. Ask one question at a time.
+      2. Ask specific questions about the projects and work experience to verify their claims.
+      3. Ask behavioral and technical questions based on the requirements in the job description.
+      4. If the conversation has just begun (history is short), introduce yourself briefly as 'Alex' and ask the first question.
+      5. After about 5-7 questions, end the interview gracefully by saying something like "That's all the questions I have for you. Thank you for your time."
+      6. Do NOT use markdown formatting in your response. Just plain text.`;
+
+    const chat = model.startChat({
+      history: [
+        { role: "user", parts: [{ text: prompt }] },
+        {
+          role: "model",
+          parts: [{ text: "Okay, I am ready to start the interview as Alex." }],
+        },
+        // Lịch sử chat
+        ...chatHistory,
+      ],
+      generationConfig: {
+        maxOutputTokens: 150,
+      },
+    });
+
+    // Lấy tin nhắn cuối cùng của người dùng để gửi
+    const lastUserMessage = chatHistory[chatHistory.length - 1].parts[0].text;
+    const result = await chat.sendMessage(lastUserMessage);
+    const response = result.response;
+    const text = response.text();
+
+    return { success: true, message: text };
+  } catch (error) {
+    console.error("Error getting AI response:", error);
+    return { success: false, error: "An internal server error occurred." };
   }
 }

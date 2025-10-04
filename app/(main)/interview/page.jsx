@@ -1,22 +1,32 @@
-import { getAssessments } from "@/actions/interview";
-import StatsCards from "./_components/stats-cards";
-import PerformanceChart from "./_components/performace-chart";
+import { Suspense } from "react";
 import QuizList from "./_components/quiz-list";
+import StatsCards from "./_components/stats-cards";
 
-export default async function InterviewPrepPage() {
-  const assessments = await getAssessments();
+import VoiceInterviewStarter from "./_components/voice-interview-starter";
+import { getResumesForInterview } from "@/actions/interview";
+
+export default async function InterviewPage() {
+  // Lấy danh sách CV từ server
+  const resumes = await getResumesForInterview();
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-6xl font-bold gradient-title">
-          Interview Preparation
-        </h1>
-      </div>
-      <div className="space-y-6">
-        <StatsCards assessments={assessments} />
-        <PerformanceChart assessments={assessments} />
-        <QuizList assessments={assessments} />
+    <div className="p-4 md:p-6 lg:p-10">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-6">
+        Interview Preparation
+      </h1>
+      <div className="grid gap-8">
+        <Suspense fallback={<div>Loading Interview Practice...</div>}>
+          <VoiceInterviewStarter resumes={resumes} />
+        </Suspense>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <Suspense fallback={<div>Loading Stats...</div>}>
+            <StatsCards />
+          </Suspense>
+          <Suspense fallback={<div>Loading Quizzes...</div>}>
+            <QuizList />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
