@@ -73,7 +73,9 @@ function parseCvMarkdown(markdown) {
   if (!markdown || typeof markdown !== "string") return {};
 
   const result = {};
-  const sections = markdown.split(/\n<hr>\n/i);
+  const sections = markdown.split(
+    /\n(?:<hr>|(?=##\s*[\p{Emoji}\p{Symbol}]))\n/iu
+  );
   let contactAndNameSection = sections.shift()?.trim() || "";
 
   // Kiểm tra xem trong contact có chứa luôn cả "## 📝 Professional Summary"
