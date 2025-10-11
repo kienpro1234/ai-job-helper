@@ -1,3 +1,5 @@
+// kienpro1234/ai-job-helper/ai-job-helper-6a26caec876e145d4ee48eaa56f15f9c9acf7bd2/app/lib/parse-cv.js
+
 /**
  * Phân tích chuỗi HTML của phần contact info để lấy chi tiết.
  * @param {string} htmlString - Chuỗi HTML chứa thông tin liên hệ.
@@ -120,7 +122,6 @@ export function parseCvMarkdown(markdown) {
 
   for (let i = 0; i < sectionMappings.length; i++) {
     const current = sectionMappings[i];
-    const next = sectionMappings[i + 1];
 
     const startRegex = new RegExp(
       `^##\\s*(?:${current.icon}\\s*)?${current.title}`,
@@ -135,16 +136,25 @@ export function parseCvMarkdown(markdown) {
     );
     let sectionContent = contentToEnd;
 
-    if (next) {
+    // *** SỬA LỖI TẠI ĐÂY ***
+    // Tìm điểm kết thúc bằng cách tìm bất kỳ tiêu đề section nào tiếp theo
+    let endMatch = null;
+    for (let j = i + 1; j < sectionMappings.length; j++) {
+      const next = sectionMappings[j];
       const endRegex = new RegExp(
         `^##\\s*(?:${next.icon}\\s*)?${next.title}`,
         "im"
       );
-      const endMatch = contentToEnd.match(endRegex);
-      if (endMatch) {
-        sectionContent = contentToEnd.substring(0, endMatch.index);
+      const match = contentToEnd.match(endRegex);
+      if (match && (!endMatch || match.index < endMatch.index)) {
+        endMatch = match;
       }
     }
+
+    if (endMatch) {
+      sectionContent = contentToEnd.substring(0, endMatch.index);
+    }
+    // *** KẾT THÚC SỬA LỖI ***
 
     const cleanContent = sectionContent.replace(/<hr>\s*$/, "").trim();
 
