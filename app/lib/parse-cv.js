@@ -84,6 +84,9 @@ export function parseCvMarkdown(markdown) {
   const result = {
     contactInfo: {},
   };
+
+  const nameMatch = markdown.match(/<h1 class="resume-name">(.*?)<\/h1>/);
+  const displayName = nameMatch ? nameMatch[1] : "";
   const sectionMappings = [
     { key: "summary", title: "Professional Summary", icon: "📝" },
     { key: "skills", title: "Skills", icon: "🔧" },
@@ -105,11 +108,13 @@ export function parseCvMarkdown(markdown) {
       .trim();
 
     result.contactInfo = parseContactInfo(contactAndNameSection);
+    result.contactInfo.displayName = displayName;
 
     remainingMarkdown = markdown.substring(index);
   } else {
     // Xử lý trường hợp CV chỉ có phần header
     result.contactInfo = parseContactInfo(markdown.trim());
+    result.contactInfo.displayName = displayName;
     return result;
   }
 

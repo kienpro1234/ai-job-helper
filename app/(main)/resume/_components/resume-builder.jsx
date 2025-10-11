@@ -137,6 +137,17 @@ export default function ResumeBuilder({
     }
   }, [improvedContent, isImproving, improvingSection, setValue]);
 
+  useEffect(() => {
+    // If it's a new resume (no initialData), pre-fill from the user object
+    if (!initialData && user) {
+      setValue("contactInfo.displayName", user.fullName || "");
+      setValue(
+        "contactInfo.email",
+        user.primaryEmailAddress?.emailAddress || ""
+      );
+    }
+  }, [initialData, user, setValue]);
+
   // Handle AI improvement for a given section
 
   const handleImproveSection = async (section) => {
@@ -182,7 +193,9 @@ export default function ResumeBuilder({
     }
 
     return `
-<h1 class="resume-name">${user?.fullName || "Your Name"}</h1>
+<h1 class="resume-name">${
+      contactInfo?.displayName || user?.fullName || "Your Name"
+    }</h1>
 <div class="contact-info">
   ${parts.join("<span>&nbsp;|&nbsp;</span>")}
 </div>
@@ -322,6 +335,19 @@ export default function ResumeBuilder({
                   {errors.title && (
                     <p className="text-sm text-red-500">
                       {errors.title.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="displayName">Tên hiển thị trên CV</Label>
+                  <Input
+                    id="displayName"
+                    placeholder="Tên sẽ hiển thị ở đầu CV"
+                    {...register("contactInfo.displayName")}
+                  />
+                  {errors.contactInfo?.displayName && (
+                    <p className="text-sm text-red-500">
+                      {errors.contactInfo.displayName.message}
                     </p>
                   )}
                 </div>

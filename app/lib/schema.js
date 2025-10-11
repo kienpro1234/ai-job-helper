@@ -28,6 +28,7 @@ export const onboardingSchema = z.object({
 });
 
 export const contactSchema = z.object({
+  displayName: z.string().min(1, "Tên hiển thị không được để trống"),
   email: z.string().email("Invalid email address"),
   mobile: z.string().optional(),
   linkedin: z.string().optional(),
