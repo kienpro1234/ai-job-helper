@@ -205,7 +205,9 @@ export default function ResumeBuilder({
   const getCombinedContent = () => {
     const { summary, skills, experience, education, projects } = formValues;
     const createSection = (title, icon, content) =>
-      content?.trim() ? `## ${icon} ${title}\n\n${content}` : "";
+      content?.trim()
+        ? `## ${icon} ${title}\n\n${content.replace(/\n/g, "<br/>")}`
+        : "";
     const formatEntries = (entries, type, icon) => {
       if (!entries?.length) return "";
       const title = `## ${icon} ${type}`;
@@ -214,7 +216,9 @@ export default function ResumeBuilder({
           const dateRange = entry.current
             ? `*${entry.startDate} - Present*`
             : `*${entry.startDate} - ${entry.endDate}*`;
-          return `### **${entry.title}** at *${entry.organization}*\n${dateRange}\n\n${entry.description}`;
+          return `### **${entry.title}** at *${
+            entry.organization
+          }*\n${dateRange}\n\n${entry.description.replace(/\n/g, "<br/>")}`;
         })
         .join("\n\n");
       return `${title}\n\n${content}`;
