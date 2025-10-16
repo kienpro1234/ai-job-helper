@@ -101,3 +101,16 @@
   width: 210mm; /* A4 width */
   height: auto;
 }
+
+.markdown-preserve-line-breaks {
+  white-space: pre-wrap;
+}
+
+.markdown-preserve-line-breaks p {
+  margin-top: 0;
+  margin-bottom: 0.5em; /* Tạo một khoảng cách nhỏ ở dưới mỗi đoạn văn */
+}
+
+.markdown-preserve-line-breaks p:last-child {
+  margin-bottom: 0; /* Loại bỏ khoảng cách thừa ở cuối */
+}
